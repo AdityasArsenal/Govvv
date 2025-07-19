@@ -14,6 +14,7 @@ import { SheetTable } from "@/components/sheet-table";
 import { ExportButton } from "@/components/export-button";
 import { summarizeSheetData } from "@/ai/flows/summarize-sheet-data";
 import { useToast } from "@/hooks/use-toast";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export type Row = {
   id: number;
@@ -61,7 +62,7 @@ const staticInitialData: { [key: string]: Row[] } = {
 
 export default function DataCanvas() {
   const { toast } = useToast();
-  const [allData, setAllData] = useState(staticInitialData);
+  const [allData, setAllData] = useState<{ [key: string]: Row[] } | null>(null);
   const [filteredData, setFilteredData] = useState<Row[]>([]);
   const [selectedSheet, setSelectedSheet] = useState<string>("Sales Q1");
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -71,9 +72,16 @@ export default function DataCanvas() {
   const [summary, setSummary] = useState<string>("");
   const [isSummarizing, setIsSummarizing] = useState<boolean>(false);
 
-  const sheetNames = useMemo(() => Object.keys(allData), [allData]);
+  useEffect(() => {
+    // This hook ensures that the data is only set on the client-side,
+    // preventing hydration mismatches from Math.random().
+    setAllData(staticInitialData);
+  }, []);
+
+  const sheetNames = useMemo(() => allData ? Object.keys(allData) : [], [allData]);
 
   useEffect(() => {
+    if (!allData) return;
     const currentSheetData = allData[selectedSheet] || [];
     const filtered = currentSheetData.filter((row) => {
       if (!dateRange?.from) return true;
@@ -86,6 +94,7 @@ export default function DataCanvas() {
 
   const handleRowChange = (id: number, column: "col1" | "col2", value: number) => {
     setAllData((prev) => {
+      if (!prev) return null;
       const newData = { ...prev };
       const sheetData = newData[selectedSheet].map((row) => {
         if (row.id === id) {
@@ -102,6 +111,7 @@ export default function DataCanvas() {
 
   const handleAddRow = () => {
     setAllData((prev) => {
+      if (!prev) return null;
       const newData = { ...prev };
       const newId = Math.max(0, ...newData[selectedSheet].map((r) => r.id)) + 1;
       const newRow: Row = {
@@ -148,16 +158,27 @@ export default function DataCanvas() {
     }
   };
 
+  if (!allData) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
                 <h1 className="text-2xl font-bold font-headline text-primary">Data Canvas</h1>
-                <Button onClick={handleSummarize} disabled={isSummarizing}>
-                    {isSummarizing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                    {isSummarizing ? "Analyzing..." : "Generate Summary"}
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button onClick={handleSummarize} disabled={isSummarizing}>
+                        {isSummarizing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                        {isSummarizing ? "Analyzing..." : "Generate Summary"}
+                    </Button>
+                    <ThemeToggle />
+                </div>
             </div>
         </div>
       </header>
