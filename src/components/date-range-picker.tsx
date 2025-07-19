@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { addDays, format } from "date-fns";
+import { Calendar as CalendarIcon, Download, ChevronDown } from "lucide-react";
+import { addYears, subYears, format } from "date-fns";
 import type { DateRange } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
@@ -15,53 +15,60 @@ import {
 } from "@/components/ui/popover";
 
 interface DateRangePickerProps extends React.HTMLAttributes<HTMLDivElement> {
-  date: DateRange | undefined;
-  setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
+  // Remove date and setDate props, add onMonthDownload
+  onMonthDownload: (year: number, month: number) => void;
 }
 
 export function DateRangePicker({
   className,
-  date,
-  setDate,
+  onMonthDownload,
 }: DateRangePickerProps) {
+  const now = new Date();
+  const [year, setYear] = React.useState(now.getFullYear());
+  const [month, setMonth] = React.useState(now.getMonth());
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  // Generate a range of years (e.g., 2000-2050)
+  const years = Array.from({ length: 51 }, (_, i) => 2000 + i);
+
   return (
-    <div className={cn("grid gap-2", className)}>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            id="date"
-            variant={"outline"}
-            className={cn(
-              "w-full justify-start text-left font-normal",
-              !date && "text-muted-foreground"
-            )}
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {date?.from ? (
-              date.to ? (
-                <>
-                  {format(date.from, "LLL dd, y")} -{" "}
-                  {format(date.to, "LLL dd, y")}
-                </>
-              ) : (
-                format(date.from, "LLL dd, y")
-              )
-            ) : (
-              <span>Pick a date</span>
-            )}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            initialFocus
-            mode="range"
-            defaultMonth={date?.from}
-            selected={date}
-            onSelect={setDate}
-            numberOfMonths={2}
-          />
-        </PopoverContent>
-      </Popover>
+    <div className={cn("flex items-center gap-2", className)}>
+      <div className="relative">
+        <select
+          value={year}
+          onChange={e => setYear(Number(e.target.value))}
+          className="appearance-none border rounded px-2 py-1 text-sm pr-6 min-w-[60px]"
+          style={{ minWidth: 60 }}
+        >
+          {years.map(y => (
+            <option key={y} value={y}>{y}</option>
+          ))}
+        </select>
+        <ChevronDown className="absolute right-1 top-1/2 -translate-y-1/2 h-3 w-3 pointer-events-none text-muted-foreground" />
+      </div>
+      <div className="relative">
+        <select
+          value={month}
+          onChange={e => setMonth(Number(e.target.value))}
+          className="appearance-none border rounded px-2 py-1 text-sm pr-6 min-w-[80px]"
+          style={{ minWidth: 80 }}
+        >
+          {months.map((m, idx) => (
+            <option key={m} value={idx}>{m}</option>
+          ))}
+        </select>
+        <ChevronDown className="absolute right-1 top-1/2 -translate-y-1/2 h-3 w-3 pointer-events-none text-muted-foreground" />
+      </div>
+      <Button
+        size="sm"
+        variant="outline"
+        className="flex items-center px-2 py-1 text-xs"
+        onClick={() => onMonthDownload(year, month)}
+      >
+        <Download className="h-4 w-4 mr-1" /> Download
+      </Button>
     </div>
   );
 }

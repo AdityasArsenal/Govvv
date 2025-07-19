@@ -65,12 +65,6 @@ export default function DataCanvas() {
   const [allData, setAllData] = useState<{ [key: string]: Row[] } | null>(null);
   const [filteredData, setFilteredData] = useState<Row[]>([]);
   const [selectedSheet, setSelectedSheet] = useState<string>("Sales Q1");
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: subDays(new Date(), 29),
-    to: new Date(),
-  });
-  const [summary, setSummary] = useState<string>("");
-  const [isSummarizing, setIsSummarizing] = useState<boolean>(false);
 
   useEffect(() => {
     // This hook ensures that the data is only set on the client-side,
@@ -83,14 +77,8 @@ export default function DataCanvas() {
   useEffect(() => {
     if (!allData) return;
     const currentSheetData = allData[selectedSheet] || [];
-    const filtered = currentSheetData.filter((row) => {
-      if (!dateRange?.from) return true;
-      const from = new Date(dateRange.from.setHours(0, 0, 0, 0));
-      const to = dateRange.to ? new Date(dateRange.to.setHours(23, 59, 59, 999)) : from;
-      return row.date >= from && row.date <= to;
-    });
-    setFilteredData(filtered.sort((a,b) => b.date.getTime() - a.date.getTime()));
-  }, [selectedSheet, dateRange, allData]);
+    setFilteredData(currentSheetData.sort((a, b) => b.date.getTime() - a.date.getTime()));
+  }, [selectedSheet, allData]);
 
   const handleRowChange = (id: number, column: "col1" | "col2", value: number) => {
     setAllData((prev) => {
@@ -126,36 +114,49 @@ export default function DataCanvas() {
     });
   };
   
-  const handleSummarize = async () => {
-    setIsSummarizing(true);
-    setSummary("");
-    try {
-      if (filteredData.length === 0) {
-        toast({
-          variant: "destructive",
-          title: "No Data",
-          description: "Cannot generate summary for an empty dataset.",
-        });
-        return;
-      }
-      const formattedData = filteredData.map(d => ({ col1: d.col1, col2: d.col2, col3: d.col3 }));
-      const result = await summarizeSheetData({
-        sheetName: selectedSheet,
-        startDate: dateRange?.from?.toLocaleDateString() ?? '',
-        endDate: dateRange?.to?.toLocaleDateString() ?? '',
-        data: formattedData,
-      });
-      setSummary(result.summary);
-    } catch (error) {
-      console.error("Error summarizing data:", error);
+  // Download handler for month/year
+  const handleMonthDownload = (year: number, month: number) => {
+    if (!allData) return;
+    const currentSheetData = allData[selectedSheet] || [];
+    // Filter rows for the selected month and year
+    const filtered = currentSheetData.filter(row => {
+      return row.date.getFullYear() === year && row.date.getMonth() === month;
+    });
+    if (filtered.length === 0) {
       toast({
         variant: "destructive",
-        title: "Summarization Failed",
-        description: "An error occurred while generating the summary.",
+        title: "No Data",
+        description: `No data found for ${selectedSheet} in ${year}-${month + 1}.`,
       });
-    } finally {
-      setIsSummarizing(false);
+      return;
     }
+    // Export logic (CSV)
+    const headers = ["ID", "Date", "Column 1", "Column 2", "Column 3 (Result)"];
+    const csvContent = [
+      headers.join(","),
+      ...filtered.map(row => [
+        row.id,
+        row.date.toISOString().split('T')[0],
+        row.col1,
+        row.col2,
+        row.col3
+      ].join(","))
+    ].join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `${selectedSheet.replace(/\s+/g, '_')}-${year}-${month + 1}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    toast({
+      title: "Export Started",
+      description: `Exporting ${selectedSheet} for ${year}-${month + 1}...`,
+    });
   };
 
   if (!allData) {
@@ -173,10 +174,7 @@ export default function DataCanvas() {
             <div className="flex items-center justify-between h-16">
                 <h1 className="text-2xl font-bold font-headline text-primary">Data Canvas</h1>
                 <div className="flex items-center gap-2">
-                    <Button onClick={handleSummarize} disabled={isSummarizing}>
-                        {isSummarizing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                        {isSummarizing ? "Analyzing..." : "Generate Summary"}
-                    </Button>
+                    {/* Removed Generate Summary Button */}
                     <ThemeToggle />
                 </div>
             </div>
@@ -193,22 +191,11 @@ export default function DataCanvas() {
                 <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <SheetSelector sheets={sheetNames} value={selectedSheet} onValueChange={setSelectedSheet} />
-                        <DateRangePicker date={dateRange} setDate={setDateRange} />
+                        <DateRangePicker onMonthDownload={handleMonthDownload} />
                         <ExportButton data={filteredData} />
                     </div>
                 </CardContent>
             </Card>
-
-            {summary && (
-              <Card className="animate-in fade-in-50">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><Sparkles className="text-primary"/>AI Summary</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{summary}</p>
-                </CardContent>
-              </Card>
-            )}
 
             <Card>
                 <CardHeader>
