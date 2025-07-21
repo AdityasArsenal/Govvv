@@ -18,6 +18,7 @@ import { format, getDaysInMonth, startOfMonth, getDay, isToday } from "date-fns"
 
 interface SheetTableProps {
   selectedMonth: Date;
+  initialData: SheetTableRow[];
   onTableDataChange: (data: SheetTableRow[]) => void;
 }
 
@@ -29,34 +30,34 @@ interface SheetTableRow {
   mealType: 'rice' | 'wheat' | null; // ಅಕ್ಕಿ or ಗೋಧಿ selection
 }
 
-export function SheetTable({ selectedMonth, onTableDataChange }: SheetTableProps) {
+export function SheetTable({ selectedMonth, initialData, onTableDataChange }: SheetTableProps) {
   
-  // Generate all dates for the current month
   const generateMonthDates = React.useCallback((date: Date) => {
     const daysInMonth = getDaysInMonth(date);
     const monthStart = startOfMonth(date);
-    const dates: SheetTableRow[] = [];
-    
-    for (let day = 1; day <= daysInMonth; day++) {
-      const currentDate = new Date(monthStart.getFullYear(), monthStart.getMonth(), day);
-      dates.push({
-        id: day,
-        date: currentDate,
-        count1to5: 0,
-        count6to8: 0,
-        mealType: null,
-      });
-    }
-    return dates;
+    return Array.from({ length: daysInMonth }, (_, i) => ({
+      id: i + 1,
+      date: new Date(monthStart.getFullYear(), monthStart.getMonth(), i + 1),
+      count1to5: 0,
+      count6to8: 0,
+      mealType: null,
+    }));
   }, []);
 
-  const [rows, setRows] = React.useState<SheetTableRow[]>(() => generateMonthDates(selectedMonth));
+  const [rows, setRows] = React.useState<SheetTableRow[]>(() => {
+    if (initialData && initialData.length > 0) {
+      return initialData.map(row => ({...row, date: new Date(row.date)}));
+    }
+    return generateMonthDates(selectedMonth);
+  });
 
-  // Update rows when month changes
   React.useEffect(() => {
-    const newRows = generateMonthDates(selectedMonth);
-    setRows(newRows);
-  }, [selectedMonth, generateMonthDates]);
+    if (initialData && initialData.length > 0) {
+        setRows(initialData.map(row => ({...row, date: new Date(row.date)})));
+    } else {
+        setRows(generateMonthDates(selectedMonth));
+    }
+  }, [selectedMonth, initialData, generateMonthDates]);
 
   // Update parent component with current table data whenever rows change
   React.useEffect(() => {

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Calendar as CalendarIcon, Download, ChevronDown } from "lucide-react";
+import { Calendar as CalendarIcon, Download, ChevronDown, Save, Loader2 } from "lucide-react";
 import { addYears, subYears, format } from "date-fns";
 import type { DateRange } from "react-day-picker";
 
@@ -17,7 +17,9 @@ import {
 interface DateRangePickerProps extends React.HTMLAttributes<HTMLDivElement> {
   selectedMonth: Date;
   onMonthChange: (year: number, month: number) => void;
-  onMonthDownload: () => void;
+    onMonthDownload: () => void;
+    onSave: () => void;
+  isSaving: boolean;
 }
 
 export function DateRangePicker({
@@ -25,6 +27,8 @@ export function DateRangePicker({
   selectedMonth,
   onMonthChange,
   onMonthDownload,
+  onSave,
+  isSaving,
 }: DateRangePickerProps) {
   const year = selectedMonth.getFullYear();
   const month = selectedMonth.getMonth();
@@ -84,6 +88,20 @@ export function DateRangePicker({
       
       <div className="flex-1" />
       
+      <Button
+        size="sm"
+        variant="outline"
+        className="flex items-center gap-2 px-4 py-2 text-sm font-medium"
+        onClick={onSave}
+        disabled={isSaving}
+      >
+        {isSaving ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Save className="h-4 w-4" />
+        )}
+        {isSaving ? 'Saving...' : 'Save'}
+      </Button>
       <Button
         size="sm"
         variant="default"

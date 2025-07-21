@@ -26,10 +26,11 @@ interface EggAndBSheetRow {
 
 interface EggAndBSheetProps {
   selectedMonth: Date;
+  initialData: EggAndBSheetRow[];
   onTableDataChange: (data: EggAndBSheetRow[]) => void;
 }
 
-export function EggAndBSheet({ selectedMonth, onTableDataChange }: EggAndBSheetProps) {
+export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange }: EggAndBSheetProps) {
   const [eggPrice, setEggPrice] = React.useState<number>(6);
   const [bananaPrice, setBananaPrice] = React.useState<number>(5);
   const generateMonthDates = React.useCallback((date: Date) => {
@@ -49,15 +50,24 @@ export function EggAndBSheet({ selectedMonth, onTableDataChange }: EggAndBSheetP
     });
   }, []);
 
-  const [rows, setRows] = React.useState<EggAndBSheetRow[]>(() => generateMonthDates(selectedMonth));
+  const [rows, setRows] = React.useState<EggAndBSheetRow[]>(() => {
+    if (initialData && initialData.length > 0) {
+      return initialData.map(row => ({...row, date: new Date(row.date)}));
+    }
+    return generateMonthDates(selectedMonth);
+  });
 
   const handlePriceChange = (setter: React.Dispatch<React.SetStateAction<number>>, value: string) => {
     setter(parseFloat(value) || 0);
   };
 
   React.useEffect(() => {
-    setRows(generateMonthDates(selectedMonth));
-  }, [selectedMonth, generateMonthDates]);
+    if (initialData && initialData.length > 0) {
+        setRows(initialData.map(row => ({...row, date: new Date(row.date)})));
+    } else {
+        setRows(generateMonthDates(selectedMonth));
+    }
+  }, [selectedMonth, initialData, generateMonthDates]);
 
   React.useEffect(() => {
     onTableDataChange(rows);

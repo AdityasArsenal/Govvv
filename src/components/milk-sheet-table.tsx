@@ -26,10 +26,11 @@ interface MilkSheetTableRow {
 
 interface MilkSheetTableProps {
   selectedMonth: Date;
+  initialData: MilkSheetTableRow[];
   onTableDataChange: (data: MilkSheetTableRow[]) => void;
 }
 
-export function MilkSheetTable({ selectedMonth, onTableDataChange }: MilkSheetTableProps) {
+export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange }: MilkSheetTableProps) {
   const generateMonthDates = React.useCallback((date: Date) => {
     const daysInMonth = getDaysInMonth(date);
     const monthStart = startOfMonth(date);
@@ -51,18 +52,20 @@ export function MilkSheetTable({ selectedMonth, onTableDataChange }: MilkSheetTa
     return dates;
   }, []);
 
-  const [rows, setRows] = React.useState<MilkSheetTableRow[]>(() => generateMonthDates(selectedMonth));
+  const [rows, setRows] = React.useState<MilkSheetTableRow[]>(() => {
+    if (initialData && initialData.length > 0) {
+      return initialData.map(row => ({...row, date: new Date(row.date)}));
+    }
+    return generateMonthDates(selectedMonth);
+  });
 
   React.useEffect(() => {
-    const newRows = generateMonthDates(selectedMonth);
-    setRows(newRows);
-  }, [selectedMonth, generateMonthDates]);
-
-  React.useEffect(() => {
-    // Recalculate the entire table when the month changes
-    const newRows = generateMonthDates(selectedMonth);
-    setRows(newRows);
-  }, [selectedMonth, generateMonthDates]);
+    if (initialData && initialData.length > 0) {
+        setRows(initialData.map(row => ({...row, date: new Date(row.date)})));
+    } else {
+        setRows(generateMonthDates(selectedMonth));
+    }
+  }, [selectedMonth, initialData, generateMonthDates]);
 
   const handleInputChange = (id: number, field: keyof MilkSheetTableRow, value: any) => {
     const newRows = [...rows];
