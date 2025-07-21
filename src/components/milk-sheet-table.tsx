@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { format, getDaysInMonth, startOfMonth, getDay, isToday } from "date-fns";
+import { TableFooter } from "@/components/ui/table";
 
 interface MilkSheetTableRow {
   id: number;
@@ -82,7 +83,8 @@ export function MilkSheetTable({ selectedMonth, onTableDataChange }: MilkSheetTa
           current.openingMilkPowder = prevTotalMilk - prevDistMilk;
 
           const prevTotalRagi = prev.openingRagi + prev.monthlyReceiptRagi;
-          const prevDistRagi = prev.totalChildren * 0.005;
+          const prevDayOfWeek = getDay(prev.date);
+          const prevDistRagi = [1, 3, 5].includes(prevDayOfWeek) ? prev.totalChildren * 0.005 : 0;
           current.openingRagi = prevTotalRagi - prevDistRagi;
         }
       }
@@ -140,14 +142,15 @@ export function MilkSheetTable({ selectedMonth, onTableDataChange }: MilkSheetTa
             const totalMilkPowder = row.openingMilkPowder + row.monthlyReceiptMilkPowder;
             const totalRagi = row.openingRagi + row.monthlyReceiptRagi;
             const distMilkPowder = row.totalChildren * 0.018;
-            const distRagi = row.totalChildren * 0.005;
+            const dayOfWeek = getDay(row.date);
+            const distRagi = [1, 3, 5].includes(dayOfWeek) ? row.totalChildren * 0.005 : 0;
             const closingMilkPowder = totalMilkPowder - distMilkPowder;
             const closingRagi = totalRagi - distRagi;
             const totalSugarCalculated = row.totalChildren * 0.44;
 
             return (
-              <TableRow key={row.id} className={`${isRowSunday ? 'text-red-600 dark:text-red-400 font-semibold' : ''} ${isRowToday ? 'bg-blue-900/50' : ''}`}>
-                <TableCell>
+              <TableRow key={row.id} className={`${isRowToday ? 'bg-blue-100 dark:bg-blue-900/50' : ''}`}>
+                <TableCell className={`${isRowSunday ? 'text-red-600 dark:text-red-400 font-semibold' : ''}`}>
                   {format(row.date, 'dd/MM/yyyy')}
                   <div className="text-xs text-gray-500">{format(row.date, 'EEEE')}</div>
                 </TableCell>
@@ -158,6 +161,7 @@ export function MilkSheetTable({ selectedMonth, onTableDataChange }: MilkSheetTa
                     onChange={(e) => handleInputChange(row.id, 'totalChildren', e.target.valueAsNumber)}
                     className="w-24"
                     placeholder="0"
+                    disabled={isRowSunday}
                   />
                 </TableCell>
                 <TableCell>{row.openingMilkPowder.toFixed(3)}</TableCell>
@@ -198,6 +202,25 @@ export function MilkSheetTable({ selectedMonth, onTableDataChange }: MilkSheetTa
             );
           })}
         </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TableCell colSpan={1} className="font-bold">Grand Total</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.totalChildren || 0), 0)}</TableCell>
+            <TableCell colSpan={2}></TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.monthlyReceiptMilkPowder || 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.monthlyReceiptRagi || 0), 0).toFixed(3)}</TableCell>
+            <TableCell colSpan={2}></TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.totalChildren * 0.018), 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => {
+                const dayOfWeek = getDay(row.date);
+                const ragiDist = [1, 3, 5].includes(dayOfWeek) ? row.totalChildren * 0.005 : 0;
+                return acc + ragiDist;
+            }, 0).toFixed(3)}</TableCell>
+            <TableCell colSpan={2}></TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.totalChildren * 0.44), 0).toFixed(2)}</TableCell>
+            <TableCell></TableCell>
+          </TableRow>
+        </TableFooter>
       </Table>
     </div>
   );

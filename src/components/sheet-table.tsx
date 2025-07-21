@@ -187,6 +187,7 @@ export function SheetTable({ selectedMonth, onTableDataChange }: SheetTableProps
                     onChange={e => handleInputChange(e, row.id, "count1to5")}
                     className="w-20"
                     placeholder="0"
+                    disabled={isRowSunday}
                   />
                 </TableCell>
                 <TableCell>{row.count1to5 > 0 && row.mealType ? c1.rice.toFixed(3) : ''}</TableCell>
@@ -201,6 +202,7 @@ export function SheetTable({ selectedMonth, onTableDataChange }: SheetTableProps
                     onChange={e => handleInputChange(e, row.id, "count6to8")}
                     className="w-20"
                     placeholder="0"
+                    disabled={isRowSunday}
                   />
                 </TableCell>
                 <TableCell>{row.count6to8 > 0 && row.mealType ? c2.rice.toFixed(3) : ''}</TableCell>
@@ -215,6 +217,24 @@ export function SheetTable({ selectedMonth, onTableDataChange }: SheetTableProps
             );
           })}
         </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TableCell colSpan={2} className="font-bold">Grand Total</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.count1to5 || 0), 0)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calc1to5(row.count1to5, row.mealType).rice, 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calc1to5(row.count1to5, row.mealType).wheat, 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calc1to5(row.count1to5, row.mealType).oil, 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calc1to5(row.count1to5, row.mealType).pulses, 0).toFixed(3)}</TableCell>
+            <TableCell className="border-r font-bold">{rows.reduce((acc, row) => acc + calc1to5(row.count1to5, row.mealType).sadilvaru, 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.count6to8 || 0), 0)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calc6to8(row.count6to8, row.mealType).rice, 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calc6to8(row.count6to8, row.mealType).wheat, 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calc6to8(row.count6to8, row.mealType).oil, 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calc6to8(row.count6to8, row.mealType).pulses, 0).toFixed(3)}</TableCell>
+            <TableCell className="border-r font-bold">{rows.reduce((acc, row) => acc + calc6to8(row.count6to8, row.mealType).sadilvaru, 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold text-center">{rows.reduce((acc, row) => acc + calc1to5(row.count1to5, row.mealType).sadilvaru + calc6to8(row.count6to8, row.mealType).sadilvaru, 0).toFixed(3)}</TableCell>
+          </TableRow>
+        </TableFooter>
       </Table>
     </div>
   );
