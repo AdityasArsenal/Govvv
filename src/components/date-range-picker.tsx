@@ -44,7 +44,11 @@ export function DateRangePicker({
   const years = Array.from({ length: 51 }, (_, i) => 2000 + i);
 
   return (
-    <div className={cn("flex items-center gap-3 p-4 bg-white rounded-lg border shadow-sm", className)}>
+    <div className={cn("flex items-center gap-3 p-4 bg-card rounded-lg border shadow-sm", className)}>
+      <div className="flex items-center gap-2">
+        <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+        <span className="text-sm font-medium text-card-foreground">Select Period:</span>
+      </div>
       <div className="flex items-center gap-2">
         <CalendarIcon className="h-4 w-4 text-muted-foreground" />
         <span className="text-sm font-medium text-gray-700">Select Period:</span>
@@ -55,7 +59,7 @@ export function DateRangePicker({
           <select
             value={year}
             onChange={e => handleYearChange(Number(e.target.value))}
-            className="appearance-none bg-white border border-gray-300 rounded-md px-3 py-2 text-sm font-medium pr-8 min-w-[80px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors"
+            className="appearance-none bg-background border border-input rounded-md px-3 py-2 text-sm font-medium pr-8 min-w-[80px] focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent hover:border-muted-foreground transition-colors"
           >
             {years.map(y => (
               <option key={y} value={y}>{y}</option>
@@ -68,7 +72,7 @@ export function DateRangePicker({
           <select
             value={month}
             onChange={e => handleMonthChange(Number(e.target.value))}
-            className="appearance-none bg-white border border-gray-300 rounded-md px-3 py-2 text-sm font-medium pr-8 min-w-[120px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors"
+            className="appearance-none bg-background border border-input rounded-md px-3 py-2 text-sm font-medium pr-8 min-w-[120px] focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent hover:border-muted-foreground transition-colors"
           >
             {months.map((m, idx) => (
               <option key={m} value={idx}>{m}</option>
@@ -83,7 +87,7 @@ export function DateRangePicker({
       <Button
         size="sm"
         variant="default"
-        className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+        className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary hover:bg-primary/90 text-primary-foreground transition-colors"
         onClick={onMonthDownload}
       >
         <Download className="h-4 w-4" /> 

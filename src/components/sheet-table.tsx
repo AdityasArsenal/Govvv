@@ -12,14 +12,11 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { Row } from "./data-canvas";
-import { PlusCircle } from "lucide-react";
+
+import { PlusCircle, Check } from "lucide-react";
 import { format, getDaysInMonth, startOfMonth, getDay, isToday } from "date-fns";
 
 interface SheetTableProps {
-  data: Row[];
-  onRowChange: (id: number, column: "col1" | "col2", value: number) => void;
-  addRow: () => void;
   selectedMonth: Date;
   onTableDataChange: (data: SheetTableRow[]) => void;
 }
@@ -32,7 +29,7 @@ interface SheetTableRow {
   mealType: 'rice' | 'wheat' | null; // ಅಕ್ಕಿ or ಗೋಧಿ selection
 }
 
-export function SheetTable({ data, onRowChange, addRow, selectedMonth, onTableDataChange }: SheetTableProps) {
+export function SheetTable({ selectedMonth, onTableDataChange }: SheetTableProps) {
   
   // Generate all dates for the current month
   const generateMonthDates = React.useCallback((date: Date) => {
@@ -147,39 +144,39 @@ export function SheetTable({ data, onRowChange, addRow, selectedMonth, onTableDa
             
             return (
               <TableRow 
-                key={row.id} 
-                className={`${
-                  isRowSunday ? 'bg-red-900 hover:bg-red-800' : ''
-                } ${
-                  isRowToday && isRowSunday ? 'ring-2 ring-red-300' : ''
-                }`}
-              >
-                <TableCell className={`font-medium ${
-                  isRowToday && isRowSunday ? 'text-red-700 font-bold' : ''
-                }`}>
-                  {format(row.date, 'dd/MM/yyyy')} ({format(row.date, 'EEEE')})
-                </TableCell>
+              key={row.id} 
+              className={`${
+                isRowToday ? 'bg-blue-100 dark:bg-blue-900/50' : ''
+              }`}
+            >
+              <TableCell className={`font-medium ${
+                isRowSunday ? 'text-red-600 dark:text-red-400 font-semibold' : ''
+              }`}>
+                {format(row.date, 'dd/MM/yyyy')} ({format(row.date, 'EEEE')})
+              </TableCell>
                 <TableCell>
-                  <div className="flex gap-1">
+                  <div className="flex flex-col gap-1">
                     <button
                       onClick={() => handleMealTypeChange(row.id, 'rice')}
-                      className={`px-2 py-1 text-xs rounded ${
-                        row.mealType === 'rice' 
-                          ? 'bg-blue-500 text-black' 
-                          : 'bg-gray-200 hover:bg-gray-300'
+                      className={`w-20 px-2 py-1 text-xs rounded flex items-center justify-center gap-1 transition-colors ${
+                        row.mealType === 'rice'
+                          ? 'bg-blue-500 text-white font-semibold'
+                          : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
                       }`}
                     >
-                      ಅಕ್ಕಿ
+                      {row.mealType === 'rice' && <Check className="h-3 w-3" />}
+                      <span>ಅಕ್ಕಿ</span>
                     </button>
                     <button
                       onClick={() => handleMealTypeChange(row.id, 'wheat')}
-                      className={`px-2 py-1 text-xs rounded ${
-                        row.mealType === 'wheat' 
-                          ? 'bg-orange-500 text-black' 
-                          : 'bg-gray-200 hover:bg-gray-300'
+                      className={`w-20 px-2 py-1 text-xs rounded flex items-center justify-center gap-1 transition-colors ${
+                        row.mealType === 'wheat'
+                          ? 'bg-orange-500 text-white font-semibold'
+                          : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
                       }`}
                     >
-                      ಗೋಧಿ
+                      {row.mealType === 'wheat' && <Check className="h-3 w-3" />}
+                      <span>ಗೋಧಿ</span>
                     </button>
                   </div>
                 </TableCell>
