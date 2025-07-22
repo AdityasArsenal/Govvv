@@ -46,7 +46,7 @@ const addPrintStyles = () => {
       word-wrap: break-word !important;
       overflow-wrap: break-word !important;
       white-space: normal !important;
-      font-size: 7px !important;
+      font-size: 14px !important; /* Standardize all number sizes */
       max-width: none !important;
       min-width: 0 !important;
     }
@@ -54,11 +54,38 @@ const addPrintStyles = () => {
     .pdf-container th {
       background: #f5f5f5 !important;
       font-weight: bold !important;
-      font-size: 8px !important;
+      font-size: 18px !important;
+    }
+
+    .pdf-container .date-cell .day {
+      font-size: 10px !important;
+      color: #666 !important;
+    }
+
+    .pdf-container .date-cell .date {
+      font-size: 18px !important;
+    }
+
+    .pdf-container thead th,
+    .pdf-container thead td,
+    .pdf-container thead th *,
+    .pdf-container thead td * {
+      background: #f5f5f5 !important;
+    }
+
+    .pdf-container input {
+      font-size: 14px !important; /* Standardize all number sizes */
+      border: none !important;
+      text-align: center !important;
+      background: transparent !important;
     }
     
+    .pdf-container button {
+      font-size: 14px !important;
+    }
+
     .pdf-container .card {
-      border: 1px solid #333 !important;
+      border: 2px solid #333 !important;
       border-radius: 4px !important;
       margin: 5px 0 !important;
     }
@@ -80,9 +107,9 @@ const addPrintStyles = () => {
     }
     
     .pdf-container .summary-section {
-      margin: 10px 0 !important;
+      margin: 20px 0 !important;
       padding: 8px !important;
-      border: 1px solid #333 !important;
+      border: 2px solid #333 !important;
       background: #f9f9f9 !important;
     }
     

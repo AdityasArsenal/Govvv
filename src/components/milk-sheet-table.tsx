@@ -124,15 +124,15 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange }
           </TableRow>
           <TableRow>
             <TableHead>ಹಾಲಿನ ಪುಡಿ</TableHead>
-            <TableHead>ರಾಗಿ</TableHead>
+            <TableHead>ರಾಗಿ ಶ್ಯೂರ್</TableHead>
             <TableHead>ಹಾಲಿನ ಪುಡಿ</TableHead>
-            <TableHead>ರಾಗಿ</TableHead>
+            <TableHead>ರಾಗಿ ಶ್ಯೂರ್</TableHead>
             <TableHead>ಹಾಲಿನ ಪುಡಿ</TableHead>
-            <TableHead>ರಾಗಿ</TableHead>
+            <TableHead>ರಾಗಿ ಶ್ಯೂರ್</TableHead>
             <TableHead>ಹಾಲಿನ ಪುಡಿ</TableHead>
-            <TableHead>ರಾಗಿ</TableHead>
+            <TableHead>ರಾಗಿ ಶ್ಯೂರ್</TableHead>
             <TableHead>ಹಾಲಿನ ಪುಡಿ</TableHead>
-            <TableHead>ರಾಗಿ</TableHead>
+            <TableHead>ರಾಗಿ ಶ್ಯೂರ್</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
