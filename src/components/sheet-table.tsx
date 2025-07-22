@@ -153,7 +153,8 @@ export function SheetTable({ selectedMonth, initialData, onTableDataChange }: Sh
               <TableCell className={`font-medium ${
                 isRowSunday ? 'text-red-600 dark:text-red-400 font-semibold' : ''
               }`}>
-                {format(row.date, 'dd/MM/yyyy')} ({format(row.date, 'EEEE')})
+                {format(row.date, 'dd/MM/yyyy')}
+                <div className="text-xs text-gray-500">{format(row.date, 'EEEE')}</div>
               </TableCell>
                 <TableCell>
                   <div className="flex flex-col gap-1">

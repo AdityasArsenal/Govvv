@@ -21,7 +21,6 @@ interface MilkSheetTableRow {
   openingRagi: number;
   monthlyReceiptMilkPowder: number;
   monthlyReceiptRagi: number;
-  headCookSignature: string;
 }
 
 interface MilkSheetTableProps {
@@ -46,7 +45,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange }
         openingRagi: 0,
         monthlyReceiptMilkPowder: 0,
         monthlyReceiptRagi: 0,
-        headCookSignature: "",
+
       });
     }
     return dates;
@@ -106,8 +105,8 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange }
       <Table>
         <TableHeader>
           <TableRow>
-            <TableCell colSpan={15} className="text-center">
-              <div className="text-lg font-semibold">
+            <TableCell colSpan={14} className="text-center">
+              <div className="text-lg font-semibold text-gray-700">
                 {format(selectedMonth, 'MMMM yyyy')} - Milk & Ragi Distribution
               </div>
             </TableCell>
@@ -121,7 +120,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange }
             <TableHead colSpan={2} className="text-center">ದಿನದ ವಿತರಣೆ</TableHead>
             <TableHead colSpan={2} className="text-center">ಅಂತಿಮ ಶಿಲ್ಕು</TableHead>
             <TableHead rowSpan={2} className="text-center align-middle">ಒಟ್ಟು ಸಕ್ಕರೆ</TableHead>
-            <TableHead rowSpan={2} className="text-center align-middle">ಮುಖ್ಯ ಅಡುಗೆಯವರ ಸಹಿ</TableHead>
+
           </TableRow>
           <TableRow>
             <TableHead>ಹಾಲಿನ ಪುಡಿ</TableHead>
@@ -153,7 +152,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange }
 
             return (
               <TableRow key={row.id} className={`${isRowToday ? 'bg-blue-100 dark:bg-blue-900/50' : ''}`}>
-                <TableCell className={`${isRowSunday ? 'text-red-600 dark:text-red-400 font-semibold' : ''}`}>
+                <TableCell className={`font-medium ${isRowSunday ? 'text-red-600 dark:text-red-400 font-semibold' : ''}`}>
                   {format(row.date, 'dd/MM/yyyy')}
                   <div className="text-xs text-gray-500">{format(row.date, 'EEEE')}</div>
                 </TableCell>
@@ -194,13 +193,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange }
                 <TableCell>{closingMilkPowder.toFixed(3)}</TableCell>
                 <TableCell>{closingRagi.toFixed(3)}</TableCell>
                 <TableCell>{totalSugarCalculated.toFixed(2)}</TableCell>
-                <TableCell>
-                  <Input 
-                    type="text" 
-                    value={row.headCookSignature}
-                    onChange={(e) => handleInputChange(row.id, 'headCookSignature', e.target.value)}
-                  />
-                </TableCell>
+
               </TableRow>
             );
           })}
@@ -221,7 +214,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange }
             }, 0).toFixed(3)}</TableCell>
             <TableCell colSpan={2}></TableCell>
             <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.totalChildren * 0.44), 0).toFixed(2)}</TableCell>
-            <TableCell></TableCell>
+
           </TableRow>
         </TableFooter>
       </Table>
