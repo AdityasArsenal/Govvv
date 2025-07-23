@@ -99,7 +99,7 @@ export function SheetTable({ selectedMonth, initialData, onTableDataChange }: Sh
   const isSunday = (date: Date) => getDay(date) === 0;
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>

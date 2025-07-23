@@ -136,7 +136,7 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange }: 
       </div>
 
       <div className="rounded-md border p-4">
-        <h3 className="text-lg font-semibold text-center mb-2">Summary</h3>
+        <h3 className="text-lg font-semibold text-center">Summary</h3>
         <Table>
           <TableHeader>
             <TableRow>
@@ -169,7 +169,7 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange }: 
         </Table>
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>

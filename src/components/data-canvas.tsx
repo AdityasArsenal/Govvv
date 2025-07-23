@@ -38,15 +38,16 @@ export default function DataCanvas() {
     <div className="flex flex-col min-h-screen">
       <PageHeader />
 
-      <main className="flex-1 container mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="flex flex-col gap-6">
-          <Card>
+      {/* ✅ CORRECTED LINE BELOW */}
+      <main className="flex-1 p-2 sm:p-4 md:p-6 lg:p-8">
+        <div className="flex flex-col gap-6 flex-1">
+          <Card className="flex-1 flex flex-col">
             <CardHeader>
               <CardTitle>Controls</CardTitle>
               <CardDescription>Select a sheet and date range to view and edit your data.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <CardContent className="flex-1">
+              <div className="grid grid-cols-1 gap-4">
                 <SheetSelector sheets={sheetNames} value={selectedSheet} onValueChange={setSelectedSheet} />
                 <DateRangePicker
                   selectedMonth={selectedMonth}

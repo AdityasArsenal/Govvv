@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  allowedDevOrigins: ['http://localhost:9002', 'http://localhost:9002/','https://c6f180dd7913.ngrok-free.app'],
   eslint: {
     ignoreDuringBuilds: true,
   },

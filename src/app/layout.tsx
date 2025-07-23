@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
 import { UserGate } from "@/components/UserGate";
+import ForceLandscape from '@/components/force-landscape';
 
 export const metadata: Metadata = {
   title: 'Data Canvas',
@@ -32,6 +33,7 @@ export default function RootLayout({
             {children}
           </UserGate>
           <Toaster />
+          <ForceLandscape />
         </ThemeProvider>
       </body>
     </html>
