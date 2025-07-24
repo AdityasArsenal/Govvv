@@ -18,6 +18,7 @@ import { handlePrint } from "@/lib/pdfUtils";
 export default function DataCanvas() {
   const { toast } = useToast();
   const printRef = React.useRef<HTMLDivElement>(null);
+  const [isDownloading, setIsDownloading] = React.useState(false);
 
   const {
     sheetNames,
@@ -30,9 +31,17 @@ export default function DataCanvas() {
     isLoading,
     isSaving,
     handleSave,
+    hasUnsavedChanges,
   } = useSheetData();
 
-  const onPrint = () => handlePrint(printRef, toast, selectedSheet, selectedMonth);
+  const onPrint = async () => {
+    setIsDownloading(true);
+    try {
+      await handlePrint(printRef, toast, selectedSheet, selectedMonth);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -55,6 +64,8 @@ export default function DataCanvas() {
                   onMonthDownload={onPrint}
                   onSave={handleSave}
                   isSaving={isSaving}
+                  hasUnsavedChanges={hasUnsavedChanges}
+                  isDownloading={isDownloading}
                 />
               </div>
             </CardContent>

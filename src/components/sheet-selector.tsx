@@ -18,21 +18,38 @@ interface SheetSelectorProps {
 }
 
 export function SheetSelector({ sheets, value, onValueChange }: SheetSelectorProps) {
+  const [hasBeenClicked, setHasBeenClicked] = React.useState(true);
+
+  React.useEffect(() => {
+    if (localStorage.getItem('sheetSelectorClicked') !== 'true') {
+      setHasBeenClicked(false);
+    }
+  }, []);
+
+  const handleClick = () => {
+    if (!hasBeenClicked) {
+      localStorage.setItem('sheetSelectorClicked', 'true');
+      setHasBeenClicked(true);
+    }
+  };
+
   return (
-    <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger className="w-full">
-        <SelectValue placeholder="Select a sheet" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel>Sheets</SelectLabel>
-          {sheets.map((sheet) => (
-            <SelectItem key={sheet} value={sheet}>
-              {sheet}
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+    <div onClick={handleClick}>
+      <Select value={value} onValueChange={onValueChange}>
+        <SelectTrigger className={`w-full ${!hasBeenClicked ? 'shine-effect' : ''}`}>
+          <SelectValue placeholder="Select a sheet" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectLabel>Sheets</SelectLabel>
+            {sheets.map((sheet) => (
+              <SelectItem key={sheet} value={sheet}>
+                {sheet}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+    </div>
   );
 }

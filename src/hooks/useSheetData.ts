@@ -61,6 +61,7 @@ export function useSheetData() {
   const [allSheetsData, setAllSheetsData] = useState<{ [key: string]: any[] }>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   useEffect(() => {
     const fetchMonthData = async () => {
@@ -125,6 +126,7 @@ export function useSheetData() {
       if (JSON.stringify(prev[sheetName]) === JSON.stringify(newData)) {
         return prev;
       }
+      setHasUnsavedChanges(true);
       return {
         ...prev,
         [sheetName]: newData,
@@ -168,6 +170,7 @@ export function useSheetData() {
         title: "Data Saved",
         description: "Your changes have been saved successfully.",
       });
+      setHasUnsavedChanges(false);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -190,5 +193,6 @@ export function useSheetData() {
     isLoading,
     isSaving,
     handleSave,
+    hasUnsavedChanges,
   };
 }

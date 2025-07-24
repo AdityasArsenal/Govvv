@@ -9,12 +9,12 @@ export function UserGate({ children }: { children: React.ReactNode }) {
   const [hasAccess, setHasAccess] = React.useState(false);
 
   React.useEffect(() => {
-    // Check for access on initial load
+    // Check for existing access
     if (localStorage.getItem('hasShared') === 'true') {
       setHasAccess(true);
     }
 
-    // Handle user auth
+    // Get user session
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
@@ -24,12 +24,12 @@ export function UserGate({ children }: { children: React.ReactNode }) {
       setUser(session?.user ?? null);
     });
 
-    // Listen for app focus to grant access after sharing
+    // Listen for visibility change to grant access after app switch
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && localStorage.getItem('isSharing') === 'true') {
+      if (document.visibilityState === 'visible' && localStorage.getItem('shareInitiated') === 'true') {
         localStorage.setItem('hasShared', 'true');
         setHasAccess(true);
-        localStorage.removeItem('isSharing');
+        localStorage.removeItem('shareInitiated');
       }
     };
 
@@ -48,20 +48,22 @@ export function UserGate({ children }: { children: React.ReactNode }) {
       url: window.location.origin,
     };
 
-    // Set a flag to indicate the sharing process has started
-    localStorage.setItem('isSharing', 'true');
-
     try {
       if (navigator.share) {
         await navigator.share(shareData);
+        // Set a flag that sharing has been initiated. Access will be granted on return.
+        localStorage.setItem('shareInitiated', 'true');
       } else {
         // Fallback for browsers that don't support Web Share API
         alert('Please share this link: ' + shareData.url);
+        // For the fallback, we'll grant access directly as we can't detect an app switch.
+        localStorage.setItem('hasShared', 'true');
+        setHasAccess(true);
       }
     } catch (error) {
       console.error('Error sharing:', error);
-      // If sharing fails, remove the flag so the user can try again
-      localStorage.removeItem('isSharing');
+      // If sharing fails, we still set the initiated flag so access is granted on return.
+      localStorage.setItem('shareInitiated', 'true');
     }
   };
 
