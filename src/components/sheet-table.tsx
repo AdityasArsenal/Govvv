@@ -223,18 +223,18 @@ export function SheetTable({ selectedMonth, initialData, onTableDataChange }: Sh
           <TableRow>
             <TableCell colSpan={2} className="font-bold">Grand Total</TableCell>
             <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.count1to5 || 0), 0)}</TableCell>
-            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calc1to5(row.count1to5, row.mealType).rice, 0).toFixed(3)}</TableCell>
-            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calc1to5(row.count1to5, row.mealType).wheat, 0).toFixed(3)}</TableCell>
-            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calc1to5(row.count1to5, row.mealType).oil, 0).toFixed(3)}</TableCell>
-            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calc1to5(row.count1to5, row.mealType).pulses, 0).toFixed(3)}</TableCell>
-            <TableCell className="border-r font-bold">{rows.reduce((acc, row) => acc + calc1to5(row.count1to5, row.mealType).sadilvaru, 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc1to5(row.count1to5, row.mealType).rice : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc1to5(row.count1to5, row.mealType).wheat : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc1to5(row.count1to5, row.mealType).oil : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc1to5(row.count1to5, row.mealType).pulses : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="border-r font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc1to5(row.count1to5, row.mealType).sadilvaru : 0), 0).toFixed(3)}</TableCell>
             <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.count6to8 || 0), 0)}</TableCell>
-            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calc6to8(row.count6to8, row.mealType).rice, 0).toFixed(3)}</TableCell>
-            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calc6to8(row.count6to8, row.mealType).wheat, 0).toFixed(3)}</TableCell>
-            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calc6to8(row.count6to8, row.mealType).oil, 0).toFixed(3)}</TableCell>
-            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calc6to8(row.count6to8, row.mealType).pulses, 0).toFixed(3)}</TableCell>
-            <TableCell className="border-r font-bold">{rows.reduce((acc, row) => acc + calc6to8(row.count6to8, row.mealType).sadilvaru, 0).toFixed(3)}</TableCell>
-            <TableCell className="font-bold text-center">{rows.reduce((acc, row) => acc + calc1to5(row.count1to5, row.mealType).sadilvaru + calc6to8(row.count6to8, row.mealType).sadilvaru, 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc6to8(row.count6to8, row.mealType).rice : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc6to8(row.count6to8, row.mealType).wheat : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc6to8(row.count6to8, row.mealType).oil : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc6to8(row.count6to8, row.mealType).pulses : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="border-r font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc6to8(row.count6to8, row.mealType).sadilvaru : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold text-center">{rows.reduce((acc, row) => acc + (row.mealType ? calc1to5(row.count1to5, row.mealType).sadilvaru + calc6to8(row.count6to8, row.mealType).sadilvaru : 0), 0).toFixed(3)}</TableCell>
           </TableRow>
         </TableFooter>
       </Table>

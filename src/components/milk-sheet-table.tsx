@@ -105,24 +105,26 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange }
       <Table>
         <TableHeader>
           <TableRow>
-            <TableCell colSpan={14} className="text-center">
+            <TableCell colSpan={13} className="text-center">
               <div className="text-lg font-semibold text-gray-700">
                 {format(selectedMonth, 'MMMM yyyy')} - Milk & Ragi Distribution
               </div>
             </TableCell>
           </TableRow>
           <TableRow>
-            <TableHead rowSpan={2} className="text-center align-middle">ದಿನಾಂಕ</TableHead>
-            <TableHead rowSpan={2} className="text-center align-middle">ಒಟ್ಟು ಮಕ್ಕಳ ಸಂಖ್ಯೆ</TableHead>
+            <TableHead className="text-center">ದಿನಾಂಕ</TableHead>
+            <TableHead className="text-center">ಒಟ್ಟು ಮಕ್ಕಳ ಸಂಖ್ಯೆ</TableHead>
             <TableHead colSpan={2} className="text-center">ಆರಂಭಿಕ ಶಿಲ್ಕು</TableHead>
             <TableHead colSpan={2} className="text-center">ತಿಂಗಳ ಸ್ವೀಕೃತಿ</TableHead>
             <TableHead colSpan={2} className="text-center">ಒಟ್ಟು</TableHead>
             <TableHead colSpan={2} className="text-center">ದಿನದ ವಿತರಣೆ</TableHead>
             <TableHead colSpan={2} className="text-center">ಅಂತಿಮ ಶಿಲ್ಕು</TableHead>
-            <TableHead rowSpan={2} className="text-center align-middle">ಒಟ್ಟು ಸಕ್ಕರೆ</TableHead>
+            <TableHead className="text-center">ಒಟ್ಟು ಸಕ್ಕರೆ</TableHead>
 
           </TableRow>
           <TableRow>
+            <TableHead></TableHead>
+            <TableHead></TableHead>
             <TableHead>ಹಾಲಿನ ಪುಡಿ</TableHead>
             <TableHead>ರಾಗಿ ಶ್ಯೂರ್</TableHead>
             <TableHead>ಹಾಲಿನ ಪುಡಿ</TableHead>
@@ -133,6 +135,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange }
             <TableHead>ರಾಗಿ ಶ್ಯೂರ್</TableHead>
             <TableHead>ಹಾಲಿನ ಪುಡಿ</TableHead>
             <TableHead>ರಾಗಿ ಶ್ಯೂರ್</TableHead>
+            <TableHead></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

@@ -169,23 +169,25 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange }: 
         </Table>
       </div>
 
-      <div className="rounded-md border overflow-x-auto">
+      <div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableCell colSpan={15} className="text-center">
+            <TableCell colSpan={14} className="text-center">
               <div className="text-lg font-semibold">{format(selectedMonth, 'MMMM yyyy')} - ಮೊಟ್ಟೆ ಮತ್ತು ಬಾಳೆಹಣ್ಣು</div>
             </TableCell>
           </TableRow>
           <TableRow>
-            <TableHead rowSpan={2} className="align-middle text-center">ದಿನಾಂಕ</TableHead>
-            <TableHead rowSpan={2} className="align-middle text-center">ಪಾವತಿಸುವವನು</TableHead>
+            <TableHead className="text-center">ದಿನಾಂಕ</TableHead>
+            <TableHead className="text-center">ಪಾವತಿಸುವವನು</TableHead>
             <TableHead colSpan={4} className="text-center">ಮೊಟ್ಟೆ</TableHead>
-            <TableHead colSpan={4} className="text-center">ಚಿಕ್ಕಿ/ಬಾಳೆ ಹಣ್ಣು</TableHead>
+            <TableHead colSpan={4} className="text-center">ಬಾಳೆ ಹಣ್ಣು</TableHead>
             <TableHead colSpan={3} className="text-center">ಒಟ್ಟು</TableHead>
-            <TableHead rowSpan={2} className="align-middle text-center">ಒಟ್ಟು ಹಣ</TableHead>
+            <TableHead className="text-center">ಒಟ್ಟು ಹಣ</TableHead>
           </TableRow>
           <TableRow>
+            <TableHead></TableHead>
+            <TableHead></TableHead>
             <TableHead>ಗಂಡು</TableHead>
             <TableHead>ಹೆಣ್ಣು</TableHead>
             <TableHead>ಒಟ್ಟು</TableHead>
@@ -197,6 +199,7 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange }: 
             <TableHead>ಗಂಡು</TableHead>
             <TableHead>ಹೆಣ್ಣು</TableHead>
             <TableHead>ಒಟ್ಟು</TableHead>
+            <TableHead></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

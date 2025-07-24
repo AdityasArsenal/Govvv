@@ -87,3 +87,13 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@page {
+  size: A4 portrait;
+  margin: 10mm; /* adjust as needed */
+}
+.pdf-container {
+  width: 100%;
+  /* … */
+}
+
