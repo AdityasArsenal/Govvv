@@ -184,7 +184,7 @@ export function DateRangePicker({
         <Button
           size="sm"
           variant="outline"
-          className={`flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium ${isAttemptingToClose ? 'blinking' : ''}`}
+          className={`flex items-center shine-effect justify-center gap-2 px-4 py-2 text-sm font-medium ${isAttemptingToClose ? 'blinking' : ''}`}
           onClick={() => { onSave(); setShowSaveReminder(false); }}
           disabled={isSaving}
         >
@@ -198,7 +198,7 @@ export function DateRangePicker({
         <Button
           size="sm"
           variant="default"
-          className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium bg-primary hover:bg-primary/90 text-primary-foreground transition-colors"
+          className="flex items-center shine-effect justify-center gap-2 px-4 py-2 text-sm font-medium bg-primary hover:bg-primary/90 text-primary-foreground transition-colors"
           onClick={handleDownloadClick}
           disabled={isDownloading}
         >
