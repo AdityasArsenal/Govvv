@@ -6,8 +6,8 @@ export default function Footer() {
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="text-center md:text-left mb-4 md:mb-0">
-            <h2 className="text-2xl font-bold">Studio</h2>
-            <p className="text-gray-400">The future of creative collaboration.</p>
+            <h2 className="text-2xl font-bold">Teacher's Helper</h2>
+            <p className="text-gray-400">Simplifying school management.</p>
           </div>
           <div className="flex flex-col md:flex-row items-center">
             <Link href="/terms" className="text-gray-400 hover:text-white mx-4 my-2 md:my-0">Terms</Link>
@@ -16,7 +16,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-8 border-t border-gray-700 pt-4 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-500 text-sm text-center md:text-left">© {new Date().getFullYear()} Studio. All rights reserved.</p>
+          <p className="text-gray-500 text-sm text-center md:text-left">© {new Date().getFullYear()} Teacher's Helper. All rights reserved.</p>
           <div className="flex mt-4 md:mt-0">
             {/* Add social media icons here if you have them */}
           </div>

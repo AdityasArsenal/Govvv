@@ -3,10 +3,10 @@
 import { useEffect, useRef } from 'react';
 
 const roadmapData = [
-  { year: "2024 Q3", title: "Launch Alpha", description: "Initial release with core features for early adopters." },
-  { year: "2024 Q4", title: "Beta Release", description: "Public beta with enhanced stability and new integrations." },
-  { year: "2025 Q1", title: "Advanced Analytics", description: "Introducing a powerful new analytics dashboard." },
-  { year: "2025 Q2", title: "AI-Powered Suggestions", description: "Leveraging AI to provide smart recommendations and automate tasks." },
+  { year: "2024 Q3", title: "Core Module Launch", description: "Launch of Tali, Inventory, and Accounting modules for all government teachers." },
+  { year: "2024 Q4", title: "Reporting & Exports", description: "Introducing PDF report generation and data export capabilities for all users." },
+  { year: "2025 Q1", title: "Mobile App Beta", description: "Beta release of our mobile application for both Android and iOS devices." },
+  { year: "2025 Q2", title: "School District Integration", description: "Pilot program for integration with school district management software." },
 ];
 
 export default function Roadmap() {

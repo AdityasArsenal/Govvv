@@ -5,7 +5,7 @@ export default function Header() {
     <header className="bg-gray-900 text-white shadow-md">
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
         <div className="text-2xl font-bold">
-          <Link href="/">Your Logo</Link>
+          <Link href="/">Teacher's Helper</Link>
         </div>
         <div className="hidden md:flex items-center space-x-6">
           <Link href="#features" className="hover:text-gray-300">Features</Link>
