@@ -20,7 +20,7 @@ export default function PricingTiers() {
           {/* Pro Tier - Highlighted */}
           <div className="bg-blue-600 text-white rounded-lg shadow-lg p-8 text-center flex flex-col ring-4 ring-blue-400 ring-opacity-75">
             <h3 className="text-2xl font-bold mb-4">Pro</h3>
-            <p className="text-5xl font-extrabold mb-4">$15</p>
+            <p className="text-5xl font-extrabold mb-4">₹149</p>
             <p className="opacity-90 mb-6">For professionals who need more power</p>
             <ul className="text-left space-y-2 mb-8 flex-grow">
               <li>✅ All features from Free Trial</li>
@@ -34,7 +34,7 @@ export default function PricingTiers() {
           {/* Max Tier */}
           <div className="bg-white rounded-lg shadow-lg p-8 text-center flex flex-col">
             <h3 className="text-2xl font-bold text-gray-800 mb-4">Max</h3>
-            <p className="text-5xl font-extrabold text-gray-900 mb-4">$49</p>
+            <p className="text-5xl font-extrabold text-gray-900 mb-4">₹499</p>
             <p className="text-gray-600 mb-6">For power users with extensive needs</p>
             <ul className="text-left space-y-2 mb-8 flex-grow">
               <li>✅ All features from Pro</li>
