@@ -3,7 +3,19 @@ export default function ContactPage() {
     <div className="bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-lg mx-auto">
         <h1 className="text-3xl font-extrabold text-gray-900 text-center">Contact Us</h1>
-        <p className="mt-4 text-center text-gray-500">Have a question or want to work with us? Fill out the form below.</p>
+        <p className="mt-4 text-center text-gray-500">
+          Have a question or want to work with us? Fill out the form below.
+        </p>
+
+        {/* Owner contact details */}
+        <div className="mt-8 bg-white p-6 rounded-lg shadow-md text-sm text-gray-700 space-y-2">
+          <p><strong>Owner Name:</strong> Asha Vijay Patil</p>
+          <p><strong>Mobile Number:</strong> 8310339822</p>
+          <p><strong>Email:</strong> 24aditya.v.patil@gmail.com</p>
+          <p><strong>Address:</strong> Belgaum, Karnataka</p>
+        </div>
+
+        {/* Contact form */}
         <form className="mt-8 space-y-6">
           <div>
             <label htmlFor="name" className="sr-only">Name</label>
@@ -27,4 +39,3 @@ export default function ContactPage() {
     </div>
   );
 }
-
