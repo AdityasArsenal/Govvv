@@ -4,7 +4,7 @@ export default function ContactPage() {
       <div className="max-w-lg mx-auto">
         <h1 className="text-3xl font-extrabold text-gray-900 text-center">Contact Us</h1>
         <p className="mt-4 text-center text-gray-500">
-          Have a question or want to work with us? Fill out the form below.
+          Have a question or want to work with us? Fill out the form below..
         </p>
 
         {/* Owner contact details */}
