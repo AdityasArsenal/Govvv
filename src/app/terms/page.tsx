@@ -6,6 +6,9 @@ export default function TermsPage() {
         <div className="mt-8 prose prose-indigo text-gray-500 mx-auto">
           <p>Last updated: {new Date().toLocaleDateString()}</p>
 
+          <h1> Refund Policy.. </h1>
+          <p>We are not providing any refund for our services.</p>
+          
           <h2>1. Agreement to Terms</h2>
           <p>By using our services, you agree to be bound by these Terms. If you do not agree to these Terms, do not use our services.</p>
 
