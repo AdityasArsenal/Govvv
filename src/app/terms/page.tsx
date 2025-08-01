@@ -4,28 +4,56 @@ export default function TermsPage() {
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-extrabold text-gray-900 text-center">Terms and Conditions</h1>
         <div className="mt-8 prose prose-indigo text-gray-500 mx-auto">
-          <p>Last updated: {new Date().toLocaleDateString()}</p>
+          <p>Last updated: 01/08/2025</p>
 
-          <h1> Refund Policy.. </h1>
+          <h1>Refund Policy..</h1>
           <p>We are not providing any refund for our services.</p>
-          
+
           <h2>1. Agreement to Terms</h2>
-          <p>By using our services, you agree to be bound by these Terms. If you do not agree to these Terms, do not use our services.</p>
+          <p>
+            By using Data Canvas (https://gov.nonexistential.dev), you agree to these terms.
+            If you do not agree, please discontinue use of the application.
+          </p>
 
-          <h2>2. Changes to Terms or Services</h2>
-          <p>We may modify the Terms at any time, in our sole discretion. If we do so, we’ll let you know either by posting the modified Terms on the Site or through other communications. It’s important that you review the Terms whenever we modify them because if you continue to use the Services after we have posted modified Terms on the Site, you are indicating to us that you agree to be bound by the modified Terms.</p>
+          <h2>2. Use of Services</h2>
+          <p>
+            Data Canvas is provided to help Karnataka school teachers and headmasters
+            generate monthly student food expense reports. You may use the service only for lawful purposes.
+          </p>
 
-          <h2>3. Who May Use the Services</h2>
-          <p>You may use the Services only if you are 13 years or older and are not barred from using the Services under applicable law.</p>
+          <h2>3. User Authentication</h2>
+          <p>
+            We use Google OAuth for login. We do not collect your password or sensitive personal information.
+            Data is only stored if you opt to save your sheet.
+          </p>
 
-          <h2>4. Content and Content Rights</h2>
-          <p>For purposes of these Terms: (i) “Content” means text, graphics, images, music, software, audio, video, works of authorship of any kind, and information or other materials that are posted, generated, provided or otherwise made available through the Services; and (ii) “User Content” means any Content that Account holders (including you) provide to be made available through the Services.</p>
+          <h2>4. Data Handling</h2>
+          <p>
+            Data you input is not stored unless saved by you. Saved data is encrypted and securely stored.
+            We do not sell, share, or monetise any user data.
+          </p>
 
-          <h2>5. General Prohibitions</h2>
-          <p>You agree not to do any of the following: Post, upload, publish, submit or transmit any User Content that: (i) infringes, misappropriates or violates a third party’s patent, copyright, trademark, trade secret, moral rights or other intellectual property rights, or rights of publicity or privacy; (ii) violates, or encourages any conduct that would violate, any applicable law or regulation or would give rise to civil liability.</p>
+          <h2>5. Intellectual Property</h2>
+          <p>
+            All content and code on the platform is the property of the Data Canvas developers.
+            Do not copy or distribute without written permission.
+          </p>
+
+          <h2>6. Modification of Terms</h2>
+          <p>
+            We reserve the right to update these terms. Continued use of the app after changes means you accept the updated terms.
+          </p>
+
+          <h2>7. Limitation of Liability</h2>
+          <p>
+            The service is provided "as is". We are not liable for any direct or indirect damages caused
+            by errors, data loss, or miscalculations.
+          </p>
+
+          <h2>8. Contact</h2>
+          <p>If you have any questions, contact us at 24aditya.v.patil@gmail.com.</p>
         </div>
       </div>
     </div>
   );
 }
-
