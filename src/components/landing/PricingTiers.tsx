@@ -21,7 +21,7 @@ export default function PricingTiers() {
           <div className="bg-blue-600 text-white rounded-lg shadow-lg p-8 text-center flex flex-col ring-4 ring-blue-400 ring-opacity-75">
             <h3 className="text-2xl font-bold mb-4">Pro</h3>
             <p className="text-5xl font-extrabold mb-4">₹149</p>
-            <p className="opacity-90 mb-6">For professionals who need more power</p>
+            <p className="opacity-90 mb-6">1 MONTH PLAN</p>
             <ul className="text-left space-y-2 mb-8 flex-grow">
               <li>✅ All features from Free Trial</li>
               <li>✅ Download calculations as PDF</li>
@@ -34,8 +34,8 @@ export default function PricingTiers() {
           {/* Max Tier */}
           <div className="bg-white rounded-lg shadow-lg p-8 text-center flex flex-col">
             <h3 className="text-2xl font-bold text-gray-800 mb-4">Max</h3>
-            <p className="text-5xl font-extrabold text-gray-900 mb-4">₹499</p>
-            <p className="text-gray-600 mb-6">For power users with extensive needs</p>
+            <p className="text-5xl font-extrabold text-gray-900 mb-4">₹399</p>
+            <p className="text-gray-600 mb-6">3 MONTH PLAN</p>
             <ul className="text-left space-y-2 mb-8 flex-grow">
               <li>✅ All features from Pro</li>
               <li>✅ 1 month free</li>

@@ -11,7 +11,7 @@ export default function ContactPage() {
         <div className="mt-8 bg-white p-6 rounded-lg shadow-md text-sm text-gray-700 space-y-2">
           <p><strong>Owner Name:</strong> Asha Vijay Patil</p>
           <p><strong>Mobile Number:</strong> 8310339822</p>
-          <p><strong>Email:</strong> 24aditya.v.patil@gmail.com</p>
+          <p><strong>Email:</strong> ady@nonexistential.dev</p>
           <p><strong>Address:</strong> Belgaum, Karnataka</p>
         </div>
 

@@ -29,37 +29,12 @@ const RefundPolicyPage = () => {
               </p>
               <ul className="list-disc list-inside text-lg text-gray-600 space-y-2">
                 <li>
-                  <strong>Annual Subscriptions:</strong> You are eligible for a full refund if you cancel your annual subscription within 14 days of the initial purchase. No refunds will be provided for cancellations made after this 14-day period.
+                  <strong>Monthly Subscriptions:</strong> You cannot cancel or undo the subscription. We are not providing any refund for our services.
                 </li>
                 <li>
-                  <strong>Monthly Subscriptions:</strong> Monthly subscriptions are non-refundable. When you cancel a monthly subscription, you will continue to have access to the service until the end of your current billing cycle, and you will not be charged for the subsequent month.
-                </li>
-                <li>
-                  <strong>Non-Refundable Services:</strong> Any one-time service fees or charges for specific report generation outside of a subscription plan are non-refundable once the service has been rendered.
+                  <strong>3 MONTH Subscriptions:</strong> You cannot cancel or undo the subscription. We are not providing any refund for our services.
                 </li>
               </ul>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Cancellation Process</h2>
-              <p className="text-lg text-gray-600 mb-2">
-                You can cancel your subscription at any time from your account settings dashboard. The cancellation will become effective at the end of your current billing period.
-              </p>
-              <ol className="list-decimal list-inside text-lg text-gray-600 space-y-2">
-                <li>Log in to your Data Canvas account.</li>
-                <li>Navigate to the 'Subscription' or 'Billing' section.</li>
-                <li>Follow the on-screen instructions to cancel your plan.</li>
-              </ol>
-              <p className="text-lg text-gray-600 mt-4">
-                There are no cancellation fees. Upon cancellation, your access to premium features will be revoked at the end of the subscription term.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Return/Replacement Requests</h2>
-              <p className="text-lg text-gray-600">
-                As a software-as-a-service (SaaS) provider, the concepts of 'return' or 'replacement' do not directly apply. If you are experiencing technical issues or are unsatisfied with the service, please contact our support team. We are committed to resolving any problems you may encounter.
-              </p>
             </section>
 
             <section>
