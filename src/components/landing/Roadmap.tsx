@@ -3,10 +3,10 @@
 import { useEffect, useRef } from 'react';
 
 const roadmapData = [
-  { year: "2024 Q3", title: "Core Module Launch", description: "Launch of Tali, Inventory, and Accounting modules for all government teachers." },
-  { year: "2024 Q4", title: "Reporting & Exports", description: "Introducing PDF report generation and data export capabilities for all users." },
-  { year: "2025 Q1", title: "Mobile App Beta", description: "Beta release of our mobile application for both Android and iOS devices." },
-  { year: "2025 Q2", title: "School District Integration", description: "Pilot program for integration with school district management software." },
+  { year: "2025 Q2", title: "Core Module Launch", description: "Launch of Tali, Inventory, and Accounting modules for all government teachers." },
+  { year: "2025 Q3", title: "Reporting & Exports", description: "Introducing PDF report generation and data export capabilities for all users." },
+  { year: "2026 Q1", title: "Mobile App Beta", description: "Beta release of our mobile application for both Android and iOS devices." },
+  { year: "2026 Q2", title: "School District Integration", description: "Pilot program for integration with school district management software." },
 ];
 
 export default function Roadmap() {
