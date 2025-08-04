@@ -10,6 +10,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
 import { format, getDaysInMonth, startOfMonth, getDay, isToday } from "date-fns";
 import { TableFooter } from "@/components/ui/table";
 
@@ -27,9 +29,13 @@ interface MilkSheetTableProps {
   selectedMonth: Date;
   initialData: MilkSheetTableRow[];
   onTableDataChange: (data: MilkSheetTableRow[]) => void;
+  zoom: number;
+  onZoomChange: (zoom: number) => void;
 }
 
-export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange }: MilkSheetTableProps) {
+export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, zoom, onZoomChange }: MilkSheetTableProps) {
+  const tableContainerRef = React.useRef<HTMLDivElement>(null);
+  const [containerSize, setContainerSize] = React.useState({ width: 0, height: 0 });
   const generateMonthDates = React.useCallback((date: Date) => {
     const daysInMonth = getDaysInMonth(date);
     const monthStart = startOfMonth(date);
@@ -57,6 +63,15 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange }
     }
     return generateMonthDates(selectedMonth);
   });
+
+  React.useLayoutEffect(() => {
+    if (tableContainerRef.current) {
+      setContainerSize({
+        width: tableContainerRef.current.offsetWidth,
+        height: tableContainerRef.current.offsetHeight,
+      });
+    }
+  }, [rows]); // Recalculate on data change
 
   React.useEffect(() => {
     if (initialData && initialData.length > 0) {
@@ -100,9 +115,26 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange }
 
   const isSunday = (date: Date) => getDay(date) === 0;
 
+  const handleZoomIn = () => onZoomChange(zoom + 0.1);
+  const handleZoomOut = () => onZoomChange(zoom > 0.2 ? zoom - 0.1 : zoom);
+  const handleResetZoom = () => onZoomChange(1);
+
   return (
-    <div className="rounded-md border overflow-x-auto">
-      <Table>
+    <div>
+      <div className="flex items-center justify-end gap-2 mb-4">
+        <Button variant="outline" size="icon" onClick={handleZoomIn}><ZoomIn className="h-4 w-4" /></Button>
+        <Button variant="outline" size="icon" onClick={handleZoomOut}><ZoomOut className="h-4 w-4" /></Button>
+        <Button variant="outline" size="icon" onClick={handleResetZoom}><RotateCcw className="h-4 w-4" /></Button>
+      </div>
+      <div ref={tableContainerRef} className="rounded-md border overflow-x-auto">
+        <div
+          style={{
+            transform: `scale(${zoom})`,
+            transformOrigin: 'top left',
+            width: zoom === 1 ? '100%' : `${(1 / zoom) * 100}%`,
+          }}
+        >
+          <Table>
         <TableHeader>
           <TableRow>
             <TableCell colSpan={13} className="text-center">
@@ -220,7 +252,9 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange }
 
           </TableRow>
         </TableFooter>
-      </Table>
+          </Table>
+        </div>
+      </div>
     </div>
   );
 }

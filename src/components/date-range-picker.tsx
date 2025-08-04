@@ -97,7 +97,7 @@ export function DateRangePicker({
   const handleShare = async () => {
     const shareData = {
       title: 'Check out this amazing app!',
-      text: 'I found this great app for managing records. Share it with 5 groups on WhatsApp to unlock more features!',
+      text: 'ಶಿಕ್ಷಕ ಮಿತ್ರರೇ MDM ಲೆಕ್ಕಾಚಾರದ ತಲೆನೋವಿಗೆ ಪರಿಹಾರ ಬೇಕೇ??? \n \nಹಾಗಿದ್ದರೆ ಈ ಕೆಳಗಿನ ಲಿಂಕನ್ನು ಬಳಸಿ ಎಲ್ಲಾ ಲೆಕ್ಕಾಚಾರಗಳನ್ನು ಕ್ಷಣಾರ್ಧದಲ್ಲಿ ಮುಗಿಸಿ...',
       url: window.location.origin,
     };
 

@@ -14,11 +14,14 @@ import { useToast } from "@/hooks/use-toast";
 import { PageHeader } from "@/components/PageHeader";
 import { useSheetData } from "@/hooks/useSheetData";
 import { handlePrint } from "@/lib/pdfUtils";
+import { useRouter } from 'next/navigation';
 
 export default function DataCanvas() {
   const { toast } = useToast();
+  const router = useRouter();
   const printRef = React.useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = React.useState(false);
+  const [zoom, setZoom] = React.useState(1);
 
   const {
     sheetNames,
@@ -34,7 +37,27 @@ export default function DataCanvas() {
     hasUnsavedChanges,
   } = useSheetData();
 
+  React.useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [hasUnsavedChanges]);
+
+
+
   const onPrint = async () => {
+    // Reset zoom and wait for re-render
+    await setZoom(1);
+    await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI to update
     setIsDownloading(true);
     try {
       await handlePrint(printRef, toast, selectedSheet, selectedMonth);
@@ -45,7 +68,7 @@ export default function DataCanvas() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <PageHeader />
+      <PageHeader hasUnsavedChanges={hasUnsavedChanges} />
 
       {/* ✅ CORRECTED LINE BELOW */}
       <main className="flex-1 p-2 sm:p-4 md:p-6 lg:p-8">
@@ -83,6 +106,8 @@ export default function DataCanvas() {
                     initialData={allSheetsData[selectedSheet] || []}
                     onTableDataChange={(newData: any) => handleTableDataChange(selectedSheet, newData)}
                     selectedMonth={selectedMonth}
+                    zoom={zoom}
+                    onZoomChange={setZoom}
                   />
                 )}
                 {selectedSheet === "Milk & Ragi Distribution" && (
@@ -90,6 +115,8 @@ export default function DataCanvas() {
                     initialData={allSheetsData[selectedSheet] || []}
                     onTableDataChange={(newData: any) => handleTableDataChange(selectedSheet, newData)}
                     selectedMonth={selectedMonth}
+                    zoom={zoom}
+                    onZoomChange={setZoom}
                   />
                 )}
                 {selectedSheet === "ಮೊಟ್ಟೆ ಮತ್ತು ಬಾಳೆಹಣ್ಣು" && (
@@ -97,6 +124,8 @@ export default function DataCanvas() {
                     initialData={allSheetsData[selectedSheet] || []}
                     onTableDataChange={(newData: any) => handleTableDataChange(selectedSheet, newData)}
                     selectedMonth={selectedMonth}
+                    zoom={zoom}
+                    onZoomChange={setZoom}
                   />
                 )}
               </>

@@ -11,8 +11,9 @@ import {
   TableFooter,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { format, getDaysInMonth, startOfMonth, getDay, isToday } from "date-fns";
-import { Check } from "lucide-react";
+import { Check, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
 
 interface EggAndBSheetRow {
   id: number;
@@ -28,9 +29,13 @@ interface EggAndBSheetProps {
   selectedMonth: Date;
   initialData: EggAndBSheetRow[];
   onTableDataChange: (data: EggAndBSheetRow[]) => void;
+  zoom: number;
+  onZoomChange: (zoom: number) => void;
 }
 
-export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange }: EggAndBSheetProps) {
+export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange, zoom, onZoomChange }: EggAndBSheetProps) {
+  const tableContainerRef = React.useRef<HTMLDivElement>(null);
+  const [containerSize, setContainerSize] = React.useState({ width: 0, height: 0 });
   const [eggPrice, setEggPrice] = React.useState<number>(6);
   const [bananaPrice, setBananaPrice] = React.useState<number>(5);
   const generateMonthDates = React.useCallback((date: Date) => {
@@ -56,6 +61,15 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange }: 
     }
     return generateMonthDates(selectedMonth);
   });
+
+  React.useLayoutEffect(() => {
+    if (tableContainerRef.current) {
+      setContainerSize({
+        width: tableContainerRef.current.offsetWidth,
+        height: tableContainerRef.current.offsetHeight,
+      });
+    }
+  }, [rows]); // Recalculate on data change
 
   const handlePriceChange = (setter: React.Dispatch<React.SetStateAction<number>>, value: string) => {
     setter(parseFloat(value) || 0);
@@ -121,6 +135,10 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange }: 
     };
   }, [rows, eggPrice, bananaPrice]);
 
+  const handleZoomIn = () => onZoomChange(zoom + 0.1);
+  const handleZoomOut = () => onZoomChange(zoom > 0.2 ? zoom - 0.1 : zoom);
+  const handleResetZoom = () => onZoomChange(1);
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4 p-4 border rounded-lg">
@@ -169,8 +187,21 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange }: 
         </Table>
       </div>
 
-      <div className="rounded-md border">
-      <Table>
+      <div>
+        <div className="flex items-center justify-end gap-2 mb-4">
+          <Button variant="outline" size="icon" onClick={handleZoomIn}><ZoomIn className="h-4 w-4" /></Button>
+          <Button variant="outline" size="icon" onClick={handleZoomOut}><ZoomOut className="h-4 w-4" /></Button>
+          <Button variant="outline" size="icon" onClick={handleResetZoom}><RotateCcw className="h-4 w-4" /></Button>
+        </div>
+        <div ref={tableContainerRef} className="rounded-md border overflow-x-auto">
+          <div
+            style={{
+              transform: `scale(${zoom})`,
+              transformOrigin: 'top left',
+              width: zoom === 1 ? '100%' : `${(1 / zoom) * 100}%`,
+            }}
+          >
+            <Table>
         <TableHeader>
           <TableRow>
             <TableCell colSpan={14} className="text-center">
@@ -271,8 +302,10 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange }: 
                 <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calculateTotals(row).f, 0).toFixed(2)}</TableCell>
             </TableRow>
         </TableFooter>
-      </Table>
-    </div>
+            </Table>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
