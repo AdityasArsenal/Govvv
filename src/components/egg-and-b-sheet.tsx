@@ -87,8 +87,8 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange, zo
     onTableDataChange(rows);
   }, [rows, onTableDataChange]);
 
-  const handleInputChange = (id: number, field: keyof EggAndBSheetRow, value: any) => {
-    setRows(prev => prev.map(row => row.id === id ? { ...row, [field]: value } : row));
+  const handleInputChange = (id: number, field: keyof EggAndBSheetRow, value: number) => {
+    setRows(prev => prev.map(row => row.id === id ? { ...row, [field]: isNaN(value) ? 0 : value } : row));
   };
 
   const handlePayerChange = (id: number, payer: 'APF' | 'GOV') => {

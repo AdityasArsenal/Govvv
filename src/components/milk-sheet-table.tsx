@@ -23,6 +23,7 @@ interface MilkSheetTableRow {
   openingRagi: number;
   monthlyReceiptMilkPowder: number;
   monthlyReceiptRagi: number;
+  distributionType: 'milk & ragi' | 'only milk';
 }
 
 interface MilkSheetTableProps {
@@ -51,6 +52,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
         openingRagi: 0,
         monthlyReceiptMilkPowder: 0,
         monthlyReceiptRagi: 0,
+        distributionType: 'milk & ragi',
 
       });
     }
@@ -59,7 +61,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
 
   const [rows, setRows] = React.useState<MilkSheetTableRow[]>(() => {
     if (initialData && initialData.length > 0) {
-      return initialData.map(row => ({...row, date: new Date(row.date)}));
+      return initialData.map(row => ({...row, date: new Date(row.date), distributionType: row.distributionType || 'milk & ragi'}));
     }
     return generateMonthDates(selectedMonth);
   });
@@ -75,7 +77,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
 
   React.useEffect(() => {
     if (initialData && initialData.length > 0) {
-        setRows(initialData.map(row => ({...row, date: new Date(row.date)})));
+        setRows(initialData.map(row => ({...row, date: new Date(row.date), distributionType: row.distributionType || 'milk & ragi'})));
     } else {
         setRows(generateMonthDates(selectedMonth));
     }
@@ -86,7 +88,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
     const rowIndex = newRows.findIndex(row => row.id === id);
 
     if (rowIndex !== -1) {
-      (newRows[rowIndex] as any)[field] = value;
+      (newRows[rowIndex] as any)[field] = isNaN(value) ? 0 : value;
 
       // Recalculate all subsequent rows
       for (let i = rowIndex; i < newRows.length; i++) {
@@ -95,13 +97,13 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
 
         // Carry over closing stock from previous day to opening stock of current day
         if (prev) {
-          const prevTotalMilk = prev.openingMilkPowder + prev.monthlyReceiptMilkPowder;
-          const prevDistMilk = prev.totalChildren * 0.018;
+          const prevTotalMilk = (prev.openingMilkPowder || 0) + (prev.monthlyReceiptMilkPowder || 0);
+          const prevDistMilk = (prev.totalChildren || 0) * 0.018;
           current.openingMilkPowder = prevTotalMilk - prevDistMilk;
 
-          const prevTotalRagi = prev.openingRagi + prev.monthlyReceiptRagi;
+          const prevTotalRagi = (prev.openingRagi || 0) + (prev.monthlyReceiptRagi || 0);
           const prevDayOfWeek = getDay(prev.date);
-          const prevDistRagi = [1, 3, 5].includes(prevDayOfWeek) ? prev.totalChildren * 0.005 : 0;
+          const prevDistRagi = prev.distributionType === 'milk & ragi' && [1, 3, 5].includes(prevDayOfWeek) ? (prev.totalChildren || 0) * 0.005 : 0;
           current.openingRagi = prevTotalRagi - prevDistRagi;
         }
       }
@@ -114,6 +116,16 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
   }, [rows, onTableDataChange]);
 
   const isSunday = (date: Date) => getDay(date) === 0;
+
+  const handleDistributionTypeChange = (id: number, type: 'milk & ragi' | 'only milk') => {
+    const newRows = rows.map(row => {
+      if (row.id === id) {
+        return { ...row, distributionType: type };
+      }
+      return row;
+    });
+    setRows(newRows);
+  };
 
   const handleZoomIn = () => onZoomChange(zoom + 0.1);
   const handleZoomOut = () => onZoomChange(zoom > 0.2 ? zoom - 0.1 : zoom);
@@ -137,7 +149,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
           <Table>
         <TableHeader>
           <TableRow>
-            <TableCell colSpan={13} className="text-center">
+            <TableCell colSpan={14} className="text-center">
               <div className="text-lg font-semibold text-gray-700">
                 {format(selectedMonth, 'MMMM yyyy')} - Milk & Ragi Distribution
               </div>
@@ -145,6 +157,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
           </TableRow>
           <TableRow>
             <TableHead className="text-center">ದಿನಾಂಕ</TableHead>
+            <TableHead className="text-center">ಆಯ್ಕೆ</TableHead>
             <TableHead className="text-center">ಒಟ್ಟು ಮಕ್ಕಳ ಸಂಖ್ಯೆ</TableHead>
             <TableHead colSpan={2} className="text-center">ಆರಂಭಿಕ ಶಿಲ್ಕು</TableHead>
             <TableHead colSpan={2} className="text-center">ತಿಂಗಳ ಸ್ವೀಕೃತಿ</TableHead>
@@ -155,6 +168,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
 
           </TableRow>
           <TableRow>
+            <TableHead></TableHead>
             <TableHead></TableHead>
             <TableHead></TableHead>
             <TableHead>ಹಾಲಿನ ಪುಡಿ</TableHead>
@@ -176,11 +190,11 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
             const isRowToday = isToday(row.date);
 
             // Calculations
-            const totalMilkPowder = row.openingMilkPowder + row.monthlyReceiptMilkPowder;
-            const totalRagi = row.openingRagi + row.monthlyReceiptRagi;
-            const distMilkPowder = row.totalChildren * 0.018;
+            const totalMilkPowder = (row.openingMilkPowder || 0) + (row.monthlyReceiptMilkPowder || 0);
+            const totalRagi = (row.openingRagi || 0) + (row.monthlyReceiptRagi || 0);
+            const distMilkPowder = (row.totalChildren || 0) * 0.018;
             const dayOfWeek = getDay(row.date);
-            const distRagi = [1, 3, 5].includes(dayOfWeek) ? row.totalChildren * 0.005 : 0;
+            const distRagi = row.distributionType === 'milk & ragi' && [1, 3, 5].includes(dayOfWeek) ? (row.totalChildren || 0) * 0.005 : 0;
             const closingMilkPowder = totalMilkPowder - distMilkPowder;
             const closingRagi = totalRagi - distRagi;
             const totalSugarCalculated = row.totalChildren * 0.44;
@@ -190,6 +204,28 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
                 <TableCell className={`font-medium ${isRowSunday ? 'text-red-600 dark:text-red-400 font-semibold' : ''}`}>
                   {format(row.date, 'dd/MM/yyyy')}
                   <div className="text-xs text-gray-500">{format(row.date, 'EEEE')}</div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-col gap-1">
+                    <button
+                      onClick={() => handleDistributionTypeChange(row.id, 'milk & ragi')}
+                      className={`w-24 px-2 py-1 text-xs rounded transition-colors ${
+                        row.distributionType === 'milk & ragi'
+                          ? 'bg-blue-500 text-white font-semibold'
+                          : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+                      }`}>
+                      ಹಾಲು ಮತ್ತು ರಾಗಿ
+                    </button>
+                    <button
+                      onClick={() => handleDistributionTypeChange(row.id, 'only milk')}
+                      className={`w-24 px-2 py-1 text-xs rounded transition-colors ${
+                        row.distributionType === 'only milk'
+                          ? 'bg-orange-500 text-white font-semibold'
+                          : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+                      }`}>
+                      ಕೇವಲ ಹಾಲು
+                    </button>
+                  </div>
                 </TableCell>
                 <TableCell>
                   <Input 
@@ -235,7 +271,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
         </TableBody>
         <TableFooter>
           <TableRow>
-            <TableCell colSpan={1} className="font-bold">Grand Total</TableCell>
+            <TableCell colSpan={2} className="font-bold">Grand Total</TableCell>
             <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.totalChildren || 0), 0)}</TableCell>
             <TableCell colSpan={2}></TableCell>
             <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.monthlyReceiptMilkPowder || 0), 0).toFixed(3)}</TableCell>
@@ -244,7 +280,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
             <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.totalChildren * 0.018), 0).toFixed(3)}</TableCell>
             <TableCell className="font-bold">{rows.reduce((acc, row) => {
                 const dayOfWeek = getDay(row.date);
-                const ragiDist = [1, 3, 5].includes(dayOfWeek) ? row.totalChildren * 0.005 : 0;
+                const ragiDist = row.distributionType === 'milk & ragi' && [1, 3, 5].includes(dayOfWeek) ? row.totalChildren * 0.005 : 0;
                 return acc + ragiDist;
             }, 0).toFixed(3)}</TableCell>
             <TableCell colSpan={2}></TableCell>
