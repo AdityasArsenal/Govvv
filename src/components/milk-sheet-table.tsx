@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { ZoomIn, ZoomOut, RotateCcw, Share2 } from "lucide-react";
+import { ShareButton } from "./ShareButton";
 import { format, getDaysInMonth, startOfMonth, getDay, isToday } from "date-fns";
 import { TableFooter } from "@/components/ui/table";
 
@@ -133,10 +134,16 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
 
   return (
     <div>
-      <div className="flex items-center justify-end gap-2 mb-4">
-        <Button variant="outline" size="icon" onClick={handleZoomIn}><ZoomIn className="h-4 w-4" /></Button>
-        <Button variant="outline" size="icon" onClick={handleZoomOut}><ZoomOut className="h-4 w-4" /></Button>
-        <Button variant="outline" size="icon" onClick={handleResetZoom}><RotateCcw className="h-4 w-4" /></Button>
+      <div className="flex items-center justify-between mb-4">
+        <ShareButton variant="outline" size="sm" className="gap-2">
+          <Share2 className="h-4 w-4" />
+          Share
+        </ShareButton>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="icon" onClick={handleZoomIn}><ZoomIn className="h-4 w-4" /></Button>
+          <Button variant="outline" size="icon" onClick={handleZoomOut}><ZoomOut className="h-4 w-4" /></Button>
+          <Button variant="outline" size="icon" onClick={handleResetZoom}><RotateCcw className="h-4 w-4" /></Button>
+        </div>
       </div>
       <div ref={tableContainerRef} className="rounded-md border overflow-x-auto">
         <div

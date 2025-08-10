@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { ShareButton } from '../ShareButton';
 
 export default function Header() {
   return (
@@ -13,7 +16,10 @@ export default function Header() {
             <Link href="#pricing" className="hover:text-gray-300">Pricing</Link>
             <Link href="#roadmap" className="hover:text-gray-300">Roadmap</Link>
           </div>
-          <div>
+          <div className="flex items-center gap-4">
+            <div className="hidden md:block">
+              <ShareButton />
+            </div>
             <Link href="/contact" className="hidden md:block bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
               Contact Us
             </Link>

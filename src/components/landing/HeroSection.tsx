@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { ShareButton } from '../ShareButton';
 
 export default function HeroSection() {
   return (
@@ -12,11 +15,14 @@ export default function HeroSection() {
               Get Started
             </button>
           </Link>
-          <Link href="/guide">
-            <button className="bg-transparent hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full text-md transition duration-300 border border-blue-500">
-              How to use
-            </button>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 items-center">
+            <Link href="/guide">
+              <button className="bg-transparent hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full text-md transition duration-300 border border-blue-500">
+                How to use
+              </button>
+            </Link>
+            <ShareButton className="bg-transparent hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full text-md transition duration-300 border border-blue-500" />
+          </div>
         </div>
       </div>
     </section>
