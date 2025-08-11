@@ -37,7 +37,6 @@ interface MilkSheetTableProps {
 
 export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, zoom, onZoomChange }: MilkSheetTableProps) {
   const tableContainerRef = React.useRef<HTMLDivElement>(null);
-  const [containerSize, setContainerSize] = React.useState({ width: 0, height: 0 });
   const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState(false);
 
   const generateMonthDates = React.useCallback((date: Date) => {
@@ -69,24 +68,31 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
     return generateMonthDates(selectedMonth);
   });
 
-  React.useLayoutEffect(() => {
-    if (tableContainerRef.current) {
-      setContainerSize({
-        width: tableContainerRef.current.offsetWidth,
-        height: tableContainerRef.current.offsetHeight,
-      });
-    }
-  }, [rows]); // Recalculate on data change
+  // Removed unused container size tracking for perf
 
   React.useEffect(() => {
     if (initialData && initialData.length > 0) {
-        setRows(initialData.map(row => ({...row, date: new Date(row.date), distributionType: row.distributionType || 'milk & ragi'})));
+      const normalized = initialData.map(row => ({...row, date: new Date(row.date), distributionType: row.distributionType || 'milk & ragi'}));
+      const equal = rows.length === normalized.length && rows.every((r, i) => {
+        const n = normalized[i];
+        return (
+          r.id === n.id &&
+          new Date(r.date).getTime() === new Date(n.date).getTime() &&
+          r.totalChildren === n.totalChildren &&
+          r.openingMilkPowder === n.openingMilkPowder &&
+          r.openingRagi === n.openingRagi &&
+          r.monthlyReceiptMilkPowder === n.monthlyReceiptMilkPowder &&
+          r.monthlyReceiptRagi === n.monthlyReceiptRagi &&
+          r.distributionType === n.distributionType
+        );
+      });
+      if (!equal) setRows(normalized);
     } else {
-        setRows(generateMonthDates(selectedMonth));
+      setRows(generateMonthDates(selectedMonth));
     }
   }, [selectedMonth, initialData, generateMonthDates]);
 
-  const handleInputChange = (id: number, field: keyof MilkSheetTableRow, value: any) => {
+  const handleInputChange = React.useCallback((id: number, field: keyof MilkSheetTableRow, value: any) => {
     const newRows = [...rows];
     const rowIndex = newRows.findIndex(row => row.id === id);
 
@@ -113,7 +119,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
       setRows(newRows);
       setHasUnsavedChanges(true);
     }
-  };
+  }, [rows]);
 
   React.useEffect(() => {
     onTableDataChange(rows);
@@ -137,7 +143,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
 
   const isSunday = (date: Date) => getDay(date) === 0;
 
-  const handleDistributionTypeChange = (id: number, type: 'milk & ragi' | 'only milk') => {
+  const handleDistributionTypeChange = React.useCallback((id: number, type: 'milk & ragi' | 'only milk') => {
     const newRows = rows.map(row => {
       if (row.id === id) {
         return { ...row, distributionType: type };
@@ -146,7 +152,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
     });
     setRows(newRows);
     setHasUnsavedChanges(true);
-  };
+  }, [rows]);
 
   const handleZoomIn = () => onZoomChange(zoom + 0.1);
   const handleZoomOut = () => onZoomChange(zoom > 0.2 ? zoom - 0.1 : zoom);
@@ -257,7 +263,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
                 <TableCell>
                   <Input 
                     type="number" 
-                    value={row.totalChildren || ''} 
+                    value={Number.isFinite(row.totalChildren) ? row.totalChildren : 0} 
                     onChange={(e) => handleInputChange(row.id, 'totalChildren', e.target.valueAsNumber)}
                     className="w-24"
                     placeholder="0"
@@ -269,7 +275,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
                 <TableCell>
                   <Input 
                     type="number" 
-                    value={row.monthlyReceiptMilkPowder || ''} 
+                    value={Number.isFinite(row.monthlyReceiptMilkPowder) ? row.monthlyReceiptMilkPowder : 0} 
                     onChange={(e) => handleInputChange(row.id, 'monthlyReceiptMilkPowder', e.target.valueAsNumber)}
                     className="w-24"
                     placeholder="0"
@@ -278,7 +284,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
                 <TableCell>
                   <Input 
                     type="number" 
-                    value={row.monthlyReceiptRagi || ''} 
+                    value={Number.isFinite(row.monthlyReceiptRagi) ? row.monthlyReceiptRagi : 0} 
                     onChange={(e) => handleInputChange(row.id, 'monthlyReceiptRagi', e.target.valueAsNumber)}
                     className="w-24"
                     placeholder="0"

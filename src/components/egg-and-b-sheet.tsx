@@ -34,9 +34,28 @@ interface EggAndBSheetProps {
   onZoomChange: (zoom: number) => void;
 }
 
+const calculateTotals = (row: EggAndBSheetRow, eggPrice: number, bananaPrice: number) => {
+  const c1 = row.eggMale || 0;
+  const c2 = row.eggFemale || 0;
+  const c3 = c1 + c2;
+  const c4 = c3 * eggPrice;
+
+  const d1 = row.chikkiMale || 0;
+  const d2 = row.chikkiFemale || 0;
+  const d3 = d1 + d2;
+  const d4 = d3 * bananaPrice;
+
+  const e1 = c1 + d1;
+  const e2 = c2 + d2;
+  const e3 = e1 + e2;
+
+  const f = c4 + d4;
+
+  return { c1, c2, c3, c4, d1, d2, d3, d4, e1, e2, e3, f };
+};
+
 export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange, zoom, onZoomChange }: EggAndBSheetProps) {
   const tableContainerRef = React.useRef<HTMLDivElement>(null);
-  const [containerSize, setContainerSize] = React.useState({ width: 0, height: 0 });
   const [eggPrice, setEggPrice] = React.useState<number>(6);
   const [bananaPrice, setBananaPrice] = React.useState<number>(6);
   const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState(false);
@@ -72,30 +91,35 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange, zo
     return generateMonthDates(selectedMonth);
   });
 
-  React.useLayoutEffect(() => {
-    if (tableContainerRef.current) {
-      setContainerSize({
-        width: tableContainerRef.current.offsetWidth,
-        height: tableContainerRef.current.offsetHeight,
-      });
-    }
-  }, [rows]); // Recalculate on data change
+  // Removed unused container size tracking for perf
 
-  const handlePriceChange = (setter: React.Dispatch<React.SetStateAction<number>>, value: string) => {
+  const handlePriceChange = React.useCallback((setter: React.Dispatch<React.SetStateAction<number>>, value: string) => {
     setter(parseFloat(value) || 0);
     setHasUnsavedChanges(true);
-  };
+  }, []);
 
   React.useEffect(() => {
     if (initialData && initialData.length > 0) {
-      // Extract meta row if present
       const meta = (initialData as any[]).find((r: any) => r && r.__meta === 'egg_and_b_prices');
       if (meta) {
         if (typeof meta.eggPrice === 'number') setEggPrice(meta.eggPrice);
         if (typeof meta.bananaPrice === 'number') setBananaPrice(meta.bananaPrice);
       }
       const filtered = initialData.filter((r: any) => !(r && r.__meta === 'egg_and_b_prices'));
-      setRows(filtered.map(row => ({...row, date: new Date((row as any).date)})));
+      const normalized = filtered.map(row => ({...row, date: new Date((row as any).date)}));
+      const equal = rows.length === normalized.length && rows.every((r, i) => {
+        const n = normalized[i] as any;
+        return (
+          r.id === n.id &&
+          new Date(r.date).getTime() === new Date(n.date).getTime() &&
+          r.payer === n.payer &&
+          r.eggMale === n.eggMale &&
+          r.eggFemale === n.eggFemale &&
+          r.chikkiMale === n.chikkiMale &&
+          r.chikkiFemale === n.chikkiFemale
+        );
+      });
+      if (!equal) setRows(normalized as any);
     } else {
       setRows(generateMonthDates(selectedMonth));
       setEggPrice(6);
@@ -112,6 +136,7 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange, zo
   // Warn user about unsaved changes
   React.useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      
       if (hasUnsavedChanges) {
         event.preventDefault();
         event.returnValue = ''; // Standard for browser to show confirmation dialog
@@ -125,54 +150,31 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange, zo
     };
   }, [hasUnsavedChanges]);
 
-  const handleInputChange = (id: number, field: keyof EggAndBSheetRow, value: number) => {
+  const handleInputChange = React.useCallback((id: number, field: keyof EggAndBSheetRow, value: number) => {
     setRows(prev => prev.map(row => row.id === id ? { ...row, [field]: isNaN(value) ? 0 : value } : row));
     setHasUnsavedChanges(true);
-  };
+  }, []);
 
-  const handlePayerChange = (id: number, payer: 'APF' | 'GOV') => {
+  const handlePayerChange = React.useCallback((id: number, payer: 'APF' | 'GOV') => {
     setRows(prev => prev.map(row => row.id === id ? { ...row, payer } : row));
     setHasUnsavedChanges(true);
-  };
+  }, []);
 
   const isSunday = (date: Date) => getDay(date) === 0;
 
-  const calculateTotals = (row: EggAndBSheetRow) => {
-    const c1 = row.eggMale || 0;
-    const c2 = row.eggFemale || 0;
-    const c3 = c1 + c2;
-    const c4 = c3 * eggPrice;
-
-    const d1 = row.chikkiMale || 0;
-    const d2 = row.chikkiFemale || 0;
-    const d3 = d1 + d2;
-    const d4 = d3 * bananaPrice;
-
-    const e1 = c1 + d1;
-    const e2 = c2 + d2;
-    const e3 = e1 + e2;
-
-    const f = c4 + d4;
-
-    return { c1, c2, c3, c4, d1, d2, d3, d4, e1, e2, e3, f };
-  };
-
   const summary = React.useMemo(() => {
-    const apfEggAmount = rows.filter(r => r.payer === 'APF').reduce((acc, row) => acc + calculateTotals(row).c4, 0);
-    const govEggAmount = rows.filter(r => r.payer === 'GOV').reduce((acc, row) => acc + calculateTotals(row).c4, 0);
-    const apfBananaAmount = rows.filter(r => r.payer === 'APF').reduce((acc, row) => acc + calculateTotals(row).d4, 0);
-    const govBananaAmount = rows.filter(r => r.payer === 'GOV').reduce((acc, row) => acc + calculateTotals(row).d4, 0);
-
+    let apfEggAmount = 0, govEggAmount = 0, apfBananaAmount = 0, govBananaAmount = 0;
+    for (const row of rows) {
+      const t = calculateTotals(row, eggPrice, bananaPrice);
+      if (row.payer === 'APF') { apfEggAmount += t.c4; apfBananaAmount += t.d4; }
+      else if (row.payer === 'GOV') { govEggAmount += t.c4; govBananaAmount += t.d4; }
+    }
     const totalEgg = apfEggAmount + govEggAmount;
     const totalBanana = apfBananaAmount + govBananaAmount;
     const apfTotal = apfEggAmount + apfBananaAmount;
     const govTotal = govEggAmount + govBananaAmount;
     const grandTotal = apfTotal + govTotal;
-
-    return {
-      apfEggAmount, govEggAmount, apfBananaAmount, govBananaAmount,
-      totalEgg, totalBanana, apfTotal, govTotal, grandTotal
-    };
+    return { apfEggAmount, govEggAmount, apfBananaAmount, govBananaAmount, totalEgg, totalBanana, apfTotal, govTotal, grandTotal };
   }, [rows, eggPrice, bananaPrice]);
 
   const handleZoomIn = () => onZoomChange(zoom + 0.1);
@@ -283,7 +285,7 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange, zo
           {rows.map(row => {
             const isRowSunday = isSunday(row.date);
             const isRowToday = isToday(row.date);
-            const totals = calculateTotals(row);
+            const totals = calculateTotals(row, eggPrice, bananaPrice);
 
             return (
               <TableRow key={row.id} className={`${isRowToday ? 'bg-blue-100 dark:bg-blue-900/50' : ''}`}>
@@ -315,12 +317,12 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange, zo
                     </button>
                   </div>
                 </TableCell>
-                <TableCell><Input type="number" value={row.eggMale || ''} onChange={e => handleInputChange(row.id, 'eggMale', e.target.valueAsNumber)} disabled={isRowSunday} className="w-20" /></TableCell>
-                <TableCell><Input type="number" value={row.eggFemale || ''} onChange={e => handleInputChange(row.id, 'eggFemale', e.target.valueAsNumber)} disabled={isRowSunday} className="w-20" /></TableCell>
+                <TableCell><Input type="number" value={Number.isFinite(row.eggMale) ? row.eggMale : 0} onChange={e => handleInputChange(row.id, 'eggMale', e.target.valueAsNumber)} disabled={isRowSunday} className="w-20" /></TableCell>
+                <TableCell><Input type="number" value={Number.isFinite(row.eggFemale) ? row.eggFemale : 0} onChange={e => handleInputChange(row.id, 'eggFemale', e.target.valueAsNumber)} disabled={isRowSunday} className="w-20" /></TableCell>
                 <TableCell>{totals.c3}</TableCell>
                 <TableCell>{totals.c4.toFixed(2)}</TableCell>
-                <TableCell><Input type="number" value={row.chikkiMale || ''} onChange={e => handleInputChange(row.id, 'chikkiMale', e.target.valueAsNumber)} disabled={isRowSunday} className="w-20" /></TableCell>
-                <TableCell><Input type="number" value={row.chikkiFemale || ''} onChange={e => handleInputChange(row.id, 'chikkiFemale', e.target.valueAsNumber)} disabled={isRowSunday} className="w-20" /></TableCell>
+                <TableCell><Input type="number" value={Number.isFinite(row.chikkiMale) ? row.chikkiMale : 0} onChange={e => handleInputChange(row.id, 'chikkiMale', e.target.valueAsNumber)} disabled={isRowSunday} className="w-20" /></TableCell>
+                <TableCell><Input type="number" value={Number.isFinite(row.chikkiFemale) ? row.chikkiFemale : 0} onChange={e => handleInputChange(row.id, 'chikkiFemale', e.target.valueAsNumber)} disabled={isRowSunday} className="w-20" /></TableCell>
                 <TableCell>{totals.d3}</TableCell>
                 <TableCell>{totals.d4.toFixed(2)}</TableCell>
                 <TableCell>{totals.e1}</TableCell>
@@ -337,15 +339,15 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange, zo
                 <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.eggMale || 0), 0)}</TableCell>
                 <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.eggFemale || 0), 0)}</TableCell>
                 <TableCell></TableCell>
-                <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calculateTotals(row).c4, 0).toFixed(2)}</TableCell>
+                <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calculateTotals(row, eggPrice, bananaPrice).c4, 0).toFixed(2)}</TableCell>
                 <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.chikkiMale || 0), 0)}</TableCell>
                 <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.chikkiFemale || 0), 0)}</TableCell>
                 <TableCell></TableCell>
-                <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calculateTotals(row).d4, 0).toFixed(2)}</TableCell>
-                <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calculateTotals(row).e1, 0)}</TableCell>
-                <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calculateTotals(row).e2, 0)}</TableCell>
-                <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calculateTotals(row).e3, 0)}</TableCell>
-                <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calculateTotals(row).f, 0).toFixed(2)}</TableCell>
+                <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calculateTotals(row, eggPrice, bananaPrice).d4, 0).toFixed(2)}</TableCell>
+                <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calculateTotals(row, eggPrice, bananaPrice).e1, 0)}</TableCell>
+                <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calculateTotals(row, eggPrice, bananaPrice).e2, 0)}</TableCell>
+                <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calculateTotals(row, eggPrice, bananaPrice).e3, 0)}</TableCell>
+                <TableCell className="font-bold">{rows.reduce((acc, row) => acc + calculateTotals(row, eggPrice, bananaPrice).f, 0).toFixed(2)}</TableCell>
             </TableRow>
         </TableFooter>
             </Table>

@@ -22,7 +22,8 @@ const getSheetDisplayName = (sheetName: string): string => {
   const displayNames: { [key: string]: string } = {
     "Meal Planning": "MDM ದೈನಂದಿನ ದಾಸ್ತಾನು ನಿರ್ವಹಣಾ ವಹಿ",
     "Milk & Ragi Distribution": "ಹಾಲು ಮತ್ತು ರಾಗಿ ಮಾಲ್ಟ್ ನಿರ್ವಹಣಾ ವಹಿ",
-    "ಮೊಟ್ಟೆ ಮತ್ತು ಬಾಳೆಹಣ್ಣು": "ಮೊಟ್ಟೆ ಮತ್ತು ಬಾಳೆ ನಿರ್ವಹಣಾ ವಹಿ"
+    "ಮೊಟ್ಟೆ ಮತ್ತು ಬಾಳೆಹಣ್ಣು": "ಮೊಟ್ಟೆ ಮತ್ತು ಬಾಳೆ ನಿರ್ವಹಣಾ ವಹಿ",
+    "Stock Management": "ದಿನಸಿ ನಿರ್ವಹಣಾ ವಹಿ"
   };
   return displayNames[sheetName] || sheetName;
 };

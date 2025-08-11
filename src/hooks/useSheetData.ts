@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { useToast } from '@/hooks/use-toast';
 import { format, getDaysInMonth, startOfMonth, getDay, isToday } from 'date-fns';
 
-const sheetNames = ["Meal Planning", "Milk & Ragi Distribution", "ಮೊಟ್ಟೆ ಮತ್ತು ಬಾಳೆಹಣ್ಣು"];
+const sheetNames = ["Meal Planning", "Milk & Ragi Distribution", "ಮೊಟ್ಟೆ ಮತ್ತು ಬಾಳೆಹಣ್ಣು", "Stock Management"];
 
 const generateInitialData = (sheetName: string, month: Date) => {
   const daysInMonth = getDaysInMonth(month);
@@ -48,6 +48,13 @@ const generateInitialData = (sheetName: string, month: Date) => {
         eggFemale: 0,
         chikkiMale: 0,
         chikkiFemale: 0,
+      }));
+    case "Stock Management":
+      return dates.map((date, i) => ({
+        id: i + 1,
+        date: date,
+        added_1to5: { rice: 0, wheat: 0, oil: 0, pulses: 0 },
+        added_6to8: { rice: 0, wheat: 0, oil: 0, pulses: 0 },
       }));
     default:
       return [];

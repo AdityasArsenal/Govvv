@@ -236,7 +236,7 @@ export const handlePrint = async (
           const buttonGroups = clonedInput.querySelectorAll('.flex.flex-col.gap-1');
           buttonGroups.forEach((group) => {
             const selectedButton = group.querySelector(
-              'button.bg-blue-500, button.bg-orange-500, button.bg-green-500, button.bg-purple-500'
+              'button.bg-blue-500, button.bg-orange-500, button.bg-green-500, button.bg-red-500, button.bg-purple-500'
             );
             if (selectedButton) {
               const span = clonedDoc.createElement('span');

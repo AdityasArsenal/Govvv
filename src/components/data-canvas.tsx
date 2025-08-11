@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useRef } from "react";
 import { Loader2 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -10,15 +9,15 @@ import { DateRangePicker } from "@/components/date-range-picker";
 import { SheetTable } from "@/components/sheet-table";
 import { MilkSheetTable } from "@/components/milk-sheet-table";
 import { EggAndBSheet } from "@/components/egg-and-b-sheet";
+import { StockSheetTable } from "@/components/stock-sheet";
 import { useToast } from "@/hooks/use-toast";
 import { PageHeader } from "@/components/PageHeader";
 import { useSheetData } from "@/hooks/useSheetData";
-import { handlePrint } from "@/lib/pdfUtils";
-import { useRouter } from 'next/navigation';
+import { exportStockSheetToPDF } from '@/lib/stockPdfUtils';
+
 
 export default function DataCanvas() {
   const { toast } = useToast();
-  const router = useRouter();
   const printRef = React.useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = React.useState(false);
   const [zoom, setZoom] = React.useState(1);
@@ -70,17 +69,31 @@ export default function DataCanvas() {
     };
   }, [hasUnsavedChanges]);
 
-  const onPrint = async () => {
-    // Reset zoom and wait for re-render
-    await setZoom(1);
-    await new Promise(resolve => setTimeout(resolve, 100)); // Wait for UI to update
+  const onPrint = React.useCallback(async () => {
     setIsDownloading(true);
     try {
-      await handlePrint(printRef, toast, selectedSheet, selectedMonth);
+      if (selectedSheet === "Stock Management") {
+        await exportStockSheetToPDF(
+          allSheetsData[selectedSheet] || [],
+          allSheetsData["Meal Planning"] || [],
+          selectedMonth
+        );
+      } else {
+        setZoom(1);
+        await new Promise(resolve => setTimeout(resolve, 100));
+        const { handlePrint } = await import("@/lib/pdfUtils");
+        await handlePrint(printRef, toast, selectedSheet, selectedMonth);
+      }
+    } catch (error: any) {
+        toast({
+            variant: "destructive",
+            title: "Export Failed",
+            description: error.message || "An unexpected error occurred during PDF export.",
+        });
     } finally {
       setIsDownloading(false);
     }
-  };
+  }, [printRef, toast, selectedSheet, selectedMonth, allSheetsData]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -142,6 +155,16 @@ export default function DataCanvas() {
                     selectedMonth={selectedMonth}
                     zoom={zoom}
                     onZoomChange={setZoom}
+                  />
+                )}
+                {selectedSheet === "Stock Management" && (
+                  <StockSheetTable
+                    initialData={allSheetsData[selectedSheet] || []}
+                    onTableDataChange={(newData: any) => handleTableDataChange(selectedSheet, newData)}
+                    selectedMonth={selectedMonth}
+                    zoom={zoom}
+                    onZoomChange={setZoom}
+                    sheet1Data={allSheetsData["Meal Planning"] || []}
                   />
                 )}
               </>
