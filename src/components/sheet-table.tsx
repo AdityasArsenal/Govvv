@@ -38,6 +38,7 @@ interface SheetTableRow {
 export function SheetTable({ selectedMonth, initialData, onTableDataChange, zoom, onZoomChange }: SheetTableProps) {
   const tableContainerRef = React.useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = React.useState({ width: 0, height: 0 });
+  const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState(false);
   
   const generateMonthDates = React.useCallback((date: Date) => {
     const daysInMonth = getDaysInMonth(date);
@@ -79,6 +80,22 @@ export function SheetTable({ selectedMonth, initialData, onTableDataChange, zoom
   React.useEffect(() => {
     onTableDataChange(rows);
   }, [rows, onTableDataChange]);
+  
+  // Warn user about unsaved changes
+  React.useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        event.preventDefault();
+        event.returnValue = ''; // Standard for browser to show confirmation dialog
+      }
+    };
+  
+    window.addEventListener('beforeunload', handleBeforeUnload);
+  
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [hasUnsavedChanges]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -87,10 +104,12 @@ export function SheetTable({ selectedMonth, initialData, onTableDataChange, zoom
   ) => {
     const value = e.target.valueAsNumber;
     setRows(prev => prev.map(row => (row.id === id ? { ...row, [group]: isNaN(value) ? 0 : value } : row)));
+    setHasUnsavedChanges(true);
   };
 
   const handleMealTypeChange = (id: number, mealType: MealType) => {
     setRows(prev => prev.map(row => (row.id === id ? { ...row, mealType } : row)));
+    setHasUnsavedChanges(true);
   };
 
   // Remove the local month change handler since it's now controlled by parent

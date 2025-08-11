@@ -332,7 +332,9 @@ export const handlePrint = async (
     }
 
     const monthName = selectedMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-    const fileName = `${selectedSheet.replace(/[^a-zA-Z0-9]/g, '_')}_${monthName.replace(' ', '_')}.pdf`;
+    // Sanitize sheet name for filename: replace spaces with underscores, remove unsafe chars, allow Unicode
+    const sanitizedSheetName = selectedSheet.replace(/\s+/g, '_').replace(/[^\p{L}\p{N}_-]/gu, '');
+    const fileName = `${sanitizedSheetName}_${monthName.replace(' ', '_')}.pdf`;
 
     pdf.save(fileName);
 

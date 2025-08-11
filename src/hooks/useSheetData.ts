@@ -102,6 +102,7 @@ export function useSheetData() {
         });
 
         setAllSheetsData(newAllSheetsData);
+        setHasUnsavedChanges(false);
       } catch (error: any) {
         toast({
           variant: "destructive",
@@ -152,19 +153,26 @@ export function useSheetData() {
         return;
       }
 
-      const dataToSave = {
-        user_id: user.id,
-        sheet_name: selectedSheet,
-        month: selectedMonth.toISOString().slice(0, 7),
-        data: allSheetsData[selectedSheet],
-        last_saved: new Date().toISOString(),
-      };
+      const savePromises = Object.keys(allSheetsData).map(async (sheetName) => {
+        const dataToSave = {
+          user_id: user.id,
+          sheet_name: sheetName,
+          month: selectedMonth.toISOString().slice(0, 7),
+          data: allSheetsData[sheetName],
+          last_saved: new Date().toISOString(),
+        };
 
-      const { error } = await supabase
-        .from('monthly_sheet_data')
-        .upsert(dataToSave, { onConflict: 'user_id, sheet_name, month' });
+        const { error } = await supabase
+          .from('monthly_sheet_data')
+          .upsert(dataToSave, { onConflict: 'user_id, sheet_name, month' });
 
-      if (error) throw error;
+        if (error) {
+          console.error(`Error saving ${sheetName}:`, error);
+          throw new Error(`Failed to save ${sheetName}: ${error.message}`);
+        }
+      });
+
+      await Promise.all(savePromises);
 
       toast({
         title: "Data Saved",

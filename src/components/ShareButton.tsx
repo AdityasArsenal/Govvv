@@ -11,7 +11,7 @@ export function ShareButton({ className = "", children, ...props }: ShareButtonP
   const handleShare = async () => {
     const shareData = {
       title: 'Check out this amazing app!',
-      text: 'ಶಿಕ್ಷಕ ಮಿತ್ರರೇ MDM ಲೆಕ್ಕಾಚಾರದ ತಲೆನೋವಿಗೆ ಪರಿಹಾರ ಬೇಕೇ??? \n \nಹಾಗಿದ್ದರೆ ಈ ಕೆಳಗಿನ ಲಿಂಕನ್ನು ಬಳಸಿ ಎಲ್ಲಾ ಲೆಕ್ಕಾಚಾರಗಳನ್ನು ಕ್ಷಣಾರ್ಧದಲ್ಲಿ ಮುಗಿಸಿ...',
+      text: 'ಶಿಕ್ಷಕ ಮಿತ್ರರೇ MDM ಲೆಕ್ಕಾಚಾರದ ತಲೆನೋವಿಗೆ ಪರಿಹಾರ ಬೇಕೇ??? \n \nಹಾಗಿದ್ದರೆ ಈ ಕೆಳಗಿನ ಲಿಂಕನ್ನು ಬಳಸಿ ಎಲ್ಲಾ ಲೆಕ್ಕಾಚಾರಗಳನ್ನು ಕ್ಷಣಾರ್ಧದಲ್ಲಿ ಮುಗಿಸಿ...\nJWhatsApp group for updates: https://chat.whatsapp.com/Fgnf3AOmeux7EH7JioPYeA  \n\n',
       url: window.location.origin,
     };
 

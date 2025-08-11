@@ -39,6 +39,8 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange, zo
   const [containerSize, setContainerSize] = React.useState({ width: 0, height: 0 });
   const [eggPrice, setEggPrice] = React.useState<number>(6);
   const [bananaPrice, setBananaPrice] = React.useState<number>(5);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState(false);
+
   const generateMonthDates = React.useCallback((date: Date) => {
     const daysInMonth = getDaysInMonth(date);
     const monthStart = startOfMonth(date);
@@ -74,6 +76,7 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange, zo
 
   const handlePriceChange = (setter: React.Dispatch<React.SetStateAction<number>>, value: string) => {
     setter(parseFloat(value) || 0);
+    setHasUnsavedChanges(true);
   };
 
   React.useEffect(() => {
@@ -88,12 +91,30 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange, zo
     onTableDataChange(rows);
   }, [rows, onTableDataChange]);
 
+  // Warn user about unsaved changes
+  React.useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        event.preventDefault();
+        event.returnValue = ''; // Standard for browser to show confirmation dialog
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [hasUnsavedChanges]);
+
   const handleInputChange = (id: number, field: keyof EggAndBSheetRow, value: number) => {
     setRows(prev => prev.map(row => row.id === id ? { ...row, [field]: isNaN(value) ? 0 : value } : row));
+    setHasUnsavedChanges(true);
   };
 
   const handlePayerChange = (id: number, payer: 'APF' | 'GOV') => {
     setRows(prev => prev.map(row => row.id === id ? { ...row, payer } : row));
+    setHasUnsavedChanges(true);
   };
 
   const isSunday = (date: Date) => getDay(date) === 0;

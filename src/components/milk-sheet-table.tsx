@@ -38,6 +38,8 @@ interface MilkSheetTableProps {
 export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, zoom, onZoomChange }: MilkSheetTableProps) {
   const tableContainerRef = React.useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = React.useState({ width: 0, height: 0 });
+  const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState(false);
+
   const generateMonthDates = React.useCallback((date: Date) => {
     const daysInMonth = getDaysInMonth(date);
     const monthStart = startOfMonth(date);
@@ -109,12 +111,29 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
         }
       }
       setRows(newRows);
+      setHasUnsavedChanges(true);
     }
   };
 
   React.useEffect(() => {
     onTableDataChange(rows);
   }, [rows, onTableDataChange]);
+
+  // Warn user about unsaved changes
+  React.useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        event.preventDefault();
+        event.returnValue = ''; // Standard for browser to show confirmation dialog
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [hasUnsavedChanges]);
 
   const isSunday = (date: Date) => getDay(date) === 0;
 
@@ -126,6 +145,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
       return row;
     });
     setRows(newRows);
+    setHasUnsavedChanges(true);
   };
 
   const handleZoomIn = () => onZoomChange(zoom + 0.1);
