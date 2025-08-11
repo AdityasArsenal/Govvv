@@ -52,7 +52,23 @@ export default function DataCanvas() {
     };
   }, [hasUnsavedChanges]);
 
+  React.useEffect(() => {
+    const handlePopState = () => {
+      if (hasUnsavedChanges) {
+        const confirmNavigation = window.confirm("You have unsaved changes. Are you sure you want to leave?");
+        if (!confirmNavigation) {
+          // If user cancels, push the current state back to history to prevent navigation
+          window.history.pushState(null, '', window.location.href);
+        }
+      }
+    };
 
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [hasUnsavedChanges]);
 
   const onPrint = async () => {
     // Reset zoom and wait for re-render
