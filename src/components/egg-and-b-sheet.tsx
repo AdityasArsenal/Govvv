@@ -38,7 +38,7 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange, zo
   const tableContainerRef = React.useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = React.useState({ width: 0, height: 0 });
   const [eggPrice, setEggPrice] = React.useState<number>(6);
-  const [bananaPrice, setBananaPrice] = React.useState<number>(5);
+  const [bananaPrice, setBananaPrice] = React.useState<number>(6);
   const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState(false);
 
   const generateMonthDates = React.useCallback((date: Date) => {
@@ -60,7 +60,14 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange, zo
 
   const [rows, setRows] = React.useState<EggAndBSheetRow[]>(() => {
     if (initialData && initialData.length > 0) {
-      return initialData.map(row => ({...row, date: new Date(row.date)}));
+      // Extract meta row if present
+      const meta = (initialData as any[]).find((r: any) => r && r.__meta === 'egg_and_b_prices');
+      if (meta) {
+        if (typeof meta.eggPrice === 'number') setEggPrice(meta.eggPrice);
+        if (typeof meta.bananaPrice === 'number') setBananaPrice(meta.bananaPrice);
+      }
+      const filtered = initialData.filter((r: any) => !(r && r.__meta === 'egg_and_b_prices'));
+      return filtered.map(row => ({...row, date: new Date((row as any).date)}));
     }
     return generateMonthDates(selectedMonth);
   });
@@ -81,15 +88,26 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange, zo
 
   React.useEffect(() => {
     if (initialData && initialData.length > 0) {
-        setRows(initialData.map(row => ({...row, date: new Date(row.date)})));
+      // Extract meta row if present
+      const meta = (initialData as any[]).find((r: any) => r && r.__meta === 'egg_and_b_prices');
+      if (meta) {
+        if (typeof meta.eggPrice === 'number') setEggPrice(meta.eggPrice);
+        if (typeof meta.bananaPrice === 'number') setBananaPrice(meta.bananaPrice);
+      }
+      const filtered = initialData.filter((r: any) => !(r && r.__meta === 'egg_and_b_prices'));
+      setRows(filtered.map(row => ({...row, date: new Date((row as any).date)})));
     } else {
-        setRows(generateMonthDates(selectedMonth));
+      setRows(generateMonthDates(selectedMonth));
+      setEggPrice(6);
+      setBananaPrice(6);
     }
   }, [selectedMonth, initialData, generateMonthDates]);
 
   React.useEffect(() => {
-    onTableDataChange(rows);
-  }, [rows, onTableDataChange]);
+    // Always include a meta row so prices persist across saves
+    const meta = { __meta: 'egg_and_b_prices', eggPrice, bananaPrice } as any;
+    onTableDataChange([meta, ...rows]);
+  }, [rows, eggPrice, bananaPrice, onTableDataChange]);
 
   // Warn user about unsaved changes
   React.useEffect(() => {

@@ -25,7 +25,7 @@ interface SheetTableProps {
   onZoomChange: (zoom: number) => void;
 }
 
-type MealType = 'rice_sambar' | 'upittu' | 'masala_rice' | null;
+type MealType = 'rice' | 'wheat' | null;
 
 interface SheetTableRow {
   id: number;
@@ -33,7 +33,15 @@ interface SheetTableRow {
   count1to5: number;
   count6to8: number;
   mealType: MealType;
+  includesPulses?: boolean;
 }
+
+const normalizeMealType = (mealType: any): MealType => {
+  if (mealType === 'rice' || mealType === 'wheat' || mealType === null) return mealType as MealType;
+  if (mealType === 'rice_sambar' || mealType === 'masala_rice') return 'rice';
+  if (mealType === 'upittu') return 'wheat';
+  return null;
+};
 
 export function SheetTable({ selectedMonth, initialData, onTableDataChange, zoom, onZoomChange }: SheetTableProps) {
   const tableContainerRef = React.useRef<HTMLDivElement>(null);
@@ -49,12 +57,18 @@ export function SheetTable({ selectedMonth, initialData, onTableDataChange, zoom
       count1to5: 0,
       count6to8: 0,
       mealType: null,
+      includesPulses: false,
     }));
   }, []);
 
   const [rows, setRows] = React.useState<SheetTableRow[]>(() => {
     if (initialData && initialData.length > 0) {
-      return initialData.map(row => ({...row, date: new Date(row.date)}));
+      return initialData.map(row => ({
+        ...row,
+        date: new Date(row.date),
+        mealType: normalizeMealType((row as any).mealType),
+        includesPulses: (row as any).includesPulses ?? false,
+      }));
     }
     return generateMonthDates(selectedMonth);
   });
@@ -70,7 +84,12 @@ export function SheetTable({ selectedMonth, initialData, onTableDataChange, zoom
 
   React.useEffect(() => {
     if (initialData && initialData.length > 0) {
-        setRows(initialData.map(row => ({...row, date: new Date(row.date)})));
+        setRows(initialData.map(row => ({
+          ...row,
+          date: new Date(row.date),
+          mealType: normalizeMealType((row as any).mealType),
+          includesPulses: (row as any).includesPulses ?? false,
+        })));
     } else {
         setRows(generateMonthDates(selectedMonth));
     }
@@ -112,47 +131,42 @@ export function SheetTable({ selectedMonth, initialData, onTableDataChange, zoom
     setHasUnsavedChanges(true);
   };
 
+  const handlePulsesToggle = (id: number, include: boolean) => {
+    setRows(prev => prev.map(row => (row.id === id ? { ...row, includesPulses: include } : row)));
+    setHasUnsavedChanges(true);
+  };
+
   // Remove the local month change handler since it's now controlled by parent
 
-  const calculateMeal = (count: number, mealType: MealType, isGrade1to5: boolean) => {
+  const calculateMeal = (
+    count: number,
+    mealType: MealType,
+    includesPulses: boolean,
+    isGrade1to5: boolean
+  ) => {
     const riceVal = isGrade1to5 ? 0.1 : 0.15;
     const wheatVal = isGrade1to5 ? 0.1 : 0.15;
     const oilVal = isGrade1to5 ? 0.005 : 0.0075;
     const pulsesVal = isGrade1to5 ? 0.02 : 0.03;
     const sadilvaruVal = isGrade1to5 ? 2.15 : 3.12;
 
-    switch (mealType) {
-      case 'rice_sambar':
-        return {
-          rice: count * riceVal,
-          wheat: 0,
-          oil: count * oilVal,
-          pulses: count * pulsesVal,
-          sadilvaru: count * sadilvaruVal,
-        };
-      case 'upittu':
-        return {
-          rice: 0,
-          wheat: count * wheatVal,
-          oil: count * oilVal,
-          pulses: 0,
-          sadilvaru: count * sadilvaruVal,
-        };
-      case 'masala_rice':
-        return {
-          rice: count * riceVal,
-          wheat: 0,
-          oil: count * oilVal,
-          pulses: 0,
-          sadilvaru: count * sadilvaruVal,
-        };
-      default:
-        return { rice: 0, wheat: 0, oil: 0, pulses: 0, sadilvaru: 0 };
+    if (!mealType) {
+      return { rice: 0, wheat: 0, oil: 0, pulses: 0, sadilvaru: 0 };
     }
+
+    const riceAmount = mealType === 'rice' ? count * riceVal : 0;
+    const wheatAmount = mealType === 'wheat' ? count * wheatVal : 0;
+    const oilAmount = count * oilVal;
+    const pulsesAmount = includesPulses ? count * pulsesVal : 0;
+    const sadilvaruAmount = count * sadilvaruVal;
+
+    return { rice: riceAmount, wheat: wheatAmount, oil: oilAmount, pulses: pulsesAmount, sadilvaru: sadilvaruAmount };
   };
 
-  const calc1to5 = (count: number, mealType: MealType) => calculateMeal(count, mealType, true);
-  const calc6to8 = (count: number, mealType: MealType) => calculateMeal(count, mealType, false);
+  const calc1to5 = (count: number, mealType: MealType, includesPulses: boolean) =>
+    calculateMeal(count, mealType, includesPulses, true);
+  const calc6to8 = (count: number, mealType: MealType, includesPulses: boolean) =>
+    calculateMeal(count, mealType, includesPulses, false);
 
   // Helper function to check if a date is Sunday
   const isSunday = (date: Date) => getDay(date) === 0;
@@ -185,7 +199,7 @@ export function SheetTable({ selectedMonth, initialData, onTableDataChange, zoom
           <Table>
         <TableHeader>
           <TableRow>
-            <TableCell colSpan={16} className="text-center">
+            <TableCell colSpan={17} className="text-center">
               <div className="text-lg font-semibold text-gray-700">
                 {format(selectedMonth, 'MMMM yyyy')} - Meal Planning Schedule
               </div>
@@ -195,6 +209,7 @@ export function SheetTable({ selectedMonth, initialData, onTableDataChange, zoom
           <TableRow>
             <TableHead className="text-center font-bold">Date</TableHead>
             <TableHead className="text-center font-bold">Meal</TableHead>
+            <TableHead className="text-center font-bold"></TableHead>
             <TableHead colSpan={6} className="text-center border-r font-bold">1-5</TableHead>
             <TableHead colSpan={6} className="text-center font-bold">6-10</TableHead>
             <TableHead className="text-center font-bold">ಒಟ್ಟು ಸಾದಿಲ್ವಾರು</TableHead>
@@ -203,6 +218,7 @@ export function SheetTable({ selectedMonth, initialData, onTableDataChange, zoom
           <TableRow>
             <TableHead className="w-[100px]"></TableHead>
             <TableHead className="w-[120px]">Meal Type</TableHead>
+            <TableHead className="w-[120px]">ಬೇಳೆ (yes/no)</TableHead>
             <TableHead className="w-[100px]">ಮಕ್ಕಳ ಸಂಖ್ಯೆ</TableHead>
             <TableHead>ಅಕ್ಕಿ</TableHead>
             <TableHead>ಗೋಧಿ</TableHead>
@@ -221,8 +237,8 @@ export function SheetTable({ selectedMonth, initialData, onTableDataChange, zoom
         </TableHeader>
         <TableBody>
           {rows.map(row => {
-            const c1 = calc1to5(row.count1to5, row.mealType);
-            const c2 = calc6to8(row.count6to8, row.mealType);
+            const c1 = calc1to5(row.count1to5, row.mealType, !!row.includesPulses);
+            const c2 = calc6to8(row.count6to8, row.mealType, !!row.includesPulses);
             const totalSadilvaru = c1.sadilvaru + c2.sadilvaru;
             const totalChildren = (row.count1to5 || 0) + (row.count6to8 || 0);
             const isRowSunday = isSunday(row.date);
@@ -244,34 +260,50 @@ export function SheetTable({ selectedMonth, initialData, onTableDataChange, zoom
                 <TableCell>
                   <div className="flex flex-col gap-1">
                     <button
-                      onClick={() => handleMealTypeChange(row.id, 'rice_sambar')}
+                      onClick={() => handleMealTypeChange(row.id, 'rice')}
                       className={`w-full px-2 py-1 text-xs rounded flex items-center justify-center gap-1 transition-colors ${
-                        row.mealType === 'rice_sambar'
+                        row.mealType === 'rice'
                           ? 'bg-blue-500 text-white font-semibold'
                           : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
                       }`}>
-                      {row.mealType === 'rice_sambar' && <Check className="h-3 w-3" />}
-                      <span>ಅಕ್ಕಿ ಮತ್ತು ಸಾಂಬಾರ್</span>
+                      {row.mealType === 'rice' && <Check className="h-3 w-3" />}
+                      <span>ಅಕ್ಕಿ</span>
                     </button>
                     <button
-                      onClick={() => handleMealTypeChange(row.id, 'upittu')}
+                      onClick={() => handleMealTypeChange(row.id, 'wheat')}
                       className={`w-full px-2 py-1 text-xs rounded flex items-center justify-center gap-1 transition-colors ${
-                        row.mealType === 'upittu'
+                        row.mealType === 'wheat'
                           ? 'bg-orange-500 text-white font-semibold'
                           : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
                       }`}>
-                      {row.mealType === 'upittu' && <Check className="h-3 w-3" />}
-                      <span>ಉಪ್ಪಿಟ್ಟು</span>
+                      {row.mealType === 'wheat' && <Check className="h-3 w-3" />}
+                      <span>ಗೋಧಿ</span>
                     </button>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-col gap-1">
                     <button
-                      onClick={() => handleMealTypeChange(row.id, 'masala_rice')}
+                      onClick={() => handlePulsesToggle(row.id, true)}
                       className={`w-full px-2 py-1 text-xs rounded flex items-center justify-center gap-1 transition-colors ${
-                        row.mealType === 'masala_rice'
+                        row.includesPulses
                           ? 'bg-green-500 text-white font-semibold'
                           : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
-                      }`}>
-                      {row.mealType === 'masala_rice' && <Check className="h-3 w-3" />}
-                      <span>ಮಸಾಲ ಅನ್ನ</span>
+                      }`}
+                    >
+                      {row.includesPulses && <Check className="h-3 w-3" />}
+                      <span>Yes</span>
+                    </button>
+                    <button
+                      onClick={() => handlePulsesToggle(row.id, false)}
+                      className={`w-full px-2 py-1 text-xs rounded flex items-center justify-center gap-1 transition-colors ${
+                        !row.includesPulses
+                          ? 'bg-red-500 text-white font-semibold'
+                          : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+                      }`}
+                    >
+                      {!row.includesPulses && <Check className="h-3 w-3" />}
+                      <span>No</span>
                     </button>
                   </div>
                 </TableCell>
@@ -317,20 +349,20 @@ export function SheetTable({ selectedMonth, initialData, onTableDataChange, zoom
         </TableBody>
         <TableFooter>
           <TableRow>
-            <TableCell colSpan={2} className="font-bold">Grand Total</TableCell>
+            <TableCell colSpan={3} className="font-bold">Grand Total</TableCell>
             <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.count1to5 || 0), 0)}</TableCell>
-            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc1to5(row.count1to5, row.mealType).rice : 0), 0).toFixed(3)}</TableCell>
-            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc1to5(row.count1to5, row.mealType).wheat : 0), 0).toFixed(3)}</TableCell>
-            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc1to5(row.count1to5, row.mealType).oil : 0), 0).toFixed(3)}</TableCell>
-            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc1to5(row.count1to5, row.mealType).pulses : 0), 0).toFixed(3)}</TableCell>
-            <TableCell className="border-r font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc1to5(row.count1to5, row.mealType).sadilvaru : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc1to5(row.count1to5, row.mealType, !!row.includesPulses).rice : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc1to5(row.count1to5, row.mealType, !!row.includesPulses).wheat : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc1to5(row.count1to5, row.mealType, !!row.includesPulses).oil : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc1to5(row.count1to5, row.mealType, !!row.includesPulses).pulses : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="border-r font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc1to5(row.count1to5, row.mealType, !!row.includesPulses).sadilvaru : 0), 0).toFixed(3)}</TableCell>
             <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.count6to8 || 0), 0)}</TableCell>
-            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc6to8(row.count6to8, row.mealType).rice : 0), 0).toFixed(3)}</TableCell>
-            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc6to8(row.count6to8, row.mealType).wheat : 0), 0).toFixed(3)}</TableCell>
-            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc6to8(row.count6to8, row.mealType).oil : 0), 0).toFixed(3)}</TableCell>
-            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc6to8(row.count6to8, row.mealType).pulses : 0), 0).toFixed(3)}</TableCell>
-            <TableCell className="border-r font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc6to8(row.count6to8, row.mealType).sadilvaru : 0), 0).toFixed(3)}</TableCell>
-            <TableCell className="font-bold text-center">{rows.reduce((acc, row) => acc + (row.mealType ? calc1to5(row.count1to5, row.mealType).sadilvaru + calc6to8(row.count6to8, row.mealType).sadilvaru : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc6to8(row.count6to8, row.mealType, !!row.includesPulses).rice : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc6to8(row.count6to8, row.mealType, !!row.includesPulses).wheat : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc6to8(row.count6to8, row.mealType, !!row.includesPulses).oil : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc6to8(row.count6to8, row.mealType, !!row.includesPulses).pulses : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="border-r font-bold">{rows.reduce((acc, row) => acc + (row.mealType ? calc6to8(row.count6to8, row.mealType, !!row.includesPulses).sadilvaru : 0), 0).toFixed(3)}</TableCell>
+            <TableCell className="font-bold text-center">{rows.reduce((acc, row) => acc + (row.mealType ? calc1to5(row.count1to5, row.mealType, !!row.includesPulses).sadilvaru + calc6to8(row.count6to8, row.mealType, !!row.includesPulses).sadilvaru : 0), 0).toFixed(3)}</TableCell>
             <TableCell className="font-bold text-center">{rows.reduce((acc, row) => acc + (row.count1to5 || 0) + (row.count6to8 || 0), 0)}</TableCell>
           </TableRow>
         </TableFooter>
