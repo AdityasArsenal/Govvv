@@ -31,6 +31,10 @@ interface StockSheetRow {
   // User input part
   added_1to5: StockItem;
   added_6to8: StockItem;
+  
+  // Opening stock for 1st day (user input)
+  opening_1to5?: StockItem;
+  opening_6to8?: StockItem;
 }
 
 interface StockSheetProps {
@@ -60,11 +64,17 @@ export function StockSheetTable({
     const monthStart = startOfMonth(date);
     return Array.from({ length: daysInMonth }, (_, i) => {
       const currentDate = new Date(monthStart.getFullYear(), monthStart.getMonth(), i + 1);
+      const isFirstDay = i + 1 === 1;
       return {
         id: i + 1,
         date: currentDate,
         added_1to5: emptyStockItem(),
         added_6to8: emptyStockItem(),
+        // Only include opening stock for the 1st day
+        ...(isFirstDay && {
+          opening_1to5: emptyStockItem(),
+          opening_6to8: emptyStockItem(),
+        }),
       };
     });
   }, []);
@@ -76,6 +86,11 @@ export function StockSheetTable({
         date: new Date(row.date),
         added_1to5: row.added_1to5 || emptyStockItem(),
         added_6to8: row.added_6to8 || emptyStockItem(),
+        // Handle opening stock for existing data
+        ...(row.id === 1 && {
+          opening_1to5: row.opening_1to5 || emptyStockItem(),
+          opening_6to8: row.opening_6to8 || emptyStockItem(),
+        }),
       }));
     }
     return generateMonthDates(selectedMonth);
@@ -88,6 +103,11 @@ export function StockSheetTable({
         date: new Date(row.date),
         added_1to5: row.added_1to5 || emptyStockItem(),
         added_6to8: row.added_6to8 || emptyStockItem(),
+        // Handle opening stock for day 1
+        ...(row.id === 1 && {
+          opening_1to5: row.opening_1to5 || emptyStockItem(),
+          opening_6to8: row.opening_6to8 || emptyStockItem(),
+        }),
       }));
 
       // Guard: only update if actually different
@@ -103,7 +123,18 @@ export function StockSheetTable({
           r.added_6to8.rice === n.added_6to8.rice &&
           r.added_6to8.wheat === n.added_6to8.wheat &&
           r.added_6to8.oil === n.added_6to8.oil &&
-          r.added_6to8.pulses === n.added_6to8.pulses
+          r.added_6to8.pulses === n.added_6to8.pulses &&
+          // Check opening stock for day 1
+          (r.id !== 1 || (
+            r.opening_1to5?.rice === n.opening_1to5?.rice &&
+            r.opening_1to5?.wheat === n.opening_1to5?.wheat &&
+            r.opening_1to5?.oil === n.opening_1to5?.oil &&
+            r.opening_1to5?.pulses === n.opening_1to5?.pulses &&
+            r.opening_6to8?.rice === n.opening_6to8?.rice &&
+            r.opening_6to8?.wheat === n.opening_6to8?.wheat &&
+            r.opening_6to8?.oil === n.opening_6to8?.oil &&
+            r.opening_6to8?.pulses === n.opening_6to8?.pulses
+          ))
         );
       });
 
@@ -166,6 +197,30 @@ export function StockSheetTable({
     setHasUnsavedChanges(true);
   }, []);
 
+  const handleOpeningStockChange = React.useCallback((
+    dayId: number,
+    group: "1to5" | "6to8",
+    item: keyof StockItem,
+    value: number
+  ) => {
+    if (dayId !== 1) return; // Only allow opening stock changes for day 1
+    
+    setRows(prevRows => prevRows.map(row => {
+      if (row.id === dayId) {
+        const safeVal = Number.isFinite(value) ? value : 0;
+        const groupKey = group === '1to5' ? 'opening_1to5' : 'opening_6to8';
+        const currentStock = row[groupKey] || emptyStockItem();
+        
+        return {
+          ...row,
+          [groupKey]: { ...currentStock, [item]: safeVal }
+        };
+      }
+      return row;
+    }));
+    setHasUnsavedChanges(true);
+  }, []);
+
   // Move helper above usage to avoid TDZ errors and for reuse
   const calculateMealFromSheet1 = (
     count: number,
@@ -211,8 +266,15 @@ export function StockSheetTable({
       const dist_1to5 = sheet1DayData ? calculateMealFromSheet1(sheet1DayData.count1to5, sheet1DayData.mealType, !!sheet1DayData.includesPulses, true) : emptyStockItem();
       const dist_6to8 = sheet1DayData ? calculateMealFromSheet1(sheet1DayData.count6to8, sheet1DayData.mealType, !!sheet1DayData.includesPulses, false) : emptyStockItem();
       
-      const opening_1to5 = prevClosing_1to5;
-      const opening_6to8 = prevClosing_6to8;
+      // Use user-provided opening stock for day 1, otherwise use previous closing
+      let opening_1to5, opening_6to8;
+      if (dayRow.id === 1) {
+        opening_1to5 = dayRow.opening_1to5 || emptyStockItem();
+        opening_6to8 = dayRow.opening_6to8 || emptyStockItem();
+      } else {
+        opening_1to5 = prevClosing_1to5;
+        opening_6to8 = prevClosing_6to8;
+      }
 
       const added_1to5 = {
         rice: Number(dayRow.added_1to5.rice) || 0,
@@ -284,6 +346,21 @@ export function StockSheetTable({
       <TableCell>{(stock.wheat || 0).toFixed(3)}</TableCell>
       <TableCell>{(stock.oil || 0).toFixed(3)}</TableCell>
       <TableCell>{(stock.pulses || 0).toFixed(3)}</TableCell>
+    </>
+  );
+
+  const renderEditableOpeningStockRow = (
+    label: string,
+    stock: StockItem,
+    dayId: number,
+    group: '1to5' | '6to8',
+    disabled: boolean
+  ) => (
+    <>
+      <TableCell><Input type="number" value={stock.rice || ''} onChange={e => handleOpeningStockChange(dayId, group, 'rice', e.target.valueAsNumber)} disabled={disabled} className="w-24" /></TableCell>
+      <TableCell><Input type="number" value={stock.wheat || ''} onChange={e => handleOpeningStockChange(dayId, group, 'wheat', e.target.valueAsNumber)} disabled={disabled} className="w-24" /></TableCell>
+      <TableCell><Input type="number" value={stock.oil || ''} onChange={e => handleOpeningStockChange(dayId, group, 'oil', e.target.valueAsNumber)} disabled={disabled} className="w-24" /></TableCell>
+      <TableCell><Input type="number" value={stock.pulses || ''} onChange={e => handleOpeningStockChange(dayId, group, 'pulses', e.target.valueAsNumber)} disabled={disabled} className="w-24" /></TableCell>
     </>
   );
   
@@ -400,7 +477,10 @@ export function StockSheetTable({
                       </TableCell>
                       <TableCell>1-5</TableCell>
                       <TableCell>{day.children_1to5}</TableCell>
-                      {renderStockItemRow('1-5 Opening', day.opening_1to5)}
+                      {day.id === 1 
+                        ? renderEditableOpeningStockRow('1-5 Opening', day.opening_1to5 || emptyStockItem(), day.id, '1to5', isRowSunday)
+                        : renderStockItemRow('1-5 Opening', day.opening_1to5)
+                      }
                       {renderEditableStockItemRow('1-5 Added', day.added_1to5, day.id, '1to5', isRowSunday)}
                       {renderStockItemRow('1-5 Total', day.total_1to5)}
                       {renderStockItemRow('1-5 Distribution', day.dist_1to5)}
@@ -409,7 +489,10 @@ export function StockSheetTable({
                     <TableRow className={`${isRowToday ? 'bg-blue-100 dark:bg-blue-900/50' : ''}`}>
                       <TableCell>6-10</TableCell>
                       <TableCell>{day.children_6to8}</TableCell>
-                      {renderStockItemRow('6-10 Opening', day.opening_6to8)}
+                      {day.id === 1
+                        ? renderEditableOpeningStockRow('6-10 Opening', day.opening_6to8 || emptyStockItem(), day.id, '6to8', isRowSunday)
+                        : renderStockItemRow('6-10 Opening', day.opening_6to8)
+                      }
                       {renderEditableStockItemRow('6-10 Added', day.added_6to8, day.id, '6to8', isRowSunday)}
                       {renderStockItemRow('6-10 Total', day.total_6to8)}
                       {renderStockItemRow('6-10 Distribution', day.dist_6to8)}

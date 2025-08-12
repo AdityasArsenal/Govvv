@@ -170,17 +170,17 @@ export const exportStockSheetToPDF = async (
     table.style.boxSizing = 'border-box';
     table.innerHTML = `
       <div style="text-align:center; font-weight:700; font-size:18px; margin-bottom:8px;">${monthTitle}</div>
-      <table style="width:100%; border-collapse:collapse; table-layout:fixed; font-size:11px;">
+      <table style="width:100%; border-collapse:collapse; table-layout:fixed; font-size:11px; border:2px solid #333;">
         <thead>
           <tr>
-            <th rowspan="2" style="border:1px solid #333; padding:4px;">ದಿನಾಂಕ</th>
-            <th rowspan="2" style="border:1px solid #333; padding:4px;">ವಿಭಾಗ</th>
-            <th rowspan="2" style="border:1px solid #333; padding:4px;">ಮಕ್ಕಳ ಸಂಖ್ಯೆ</th>
-            <th colspan="4" style="border:1px solid #333; padding:4px;">ಆರಂಭಿಕ ಶಿಲ್ಕು</th>
-            <th colspan="4" style="border:1px solid #333; padding:4px;">ತಿಂಗಳ ಸ್ವೀಕೃತಿ</th>
-            <th colspan="4" style="border:1px solid #333; padding:4px;">ಒಟ್ಟು</th>
-            <th colspan="4" style="border:1px solid #333; padding:4px;">ದಿನದ ವಿತರಣೆ</th>
-            <th colspan="4" style="border:1px solid #333; padding:4px;">ಅಂತಿಮ ಶಿಲ್ಕು</th>
+            <th rowspan="2" style="border:2px solid #333; padding:4px;">ದಿನಾಂಕ</th>
+            <th rowspan="2" style="border:2px solid #333; padding:4px;">ವಿಭಾಗ</th>
+            <th rowspan="2" style="border:2px solid #333; padding:4px;">ಮಕ್ಕಳ ಸಂಖ್ಯೆ</th>
+            <th colspan="4" style="border:2px solid #333; padding:4px;">ಆರಂಭಿಕ ಶಿಲ್ಕು</th>
+            <th colspan="4" style="border:2px solid #333; padding:4px;">ತಿಂಗಳ ಸ್ವೀಕೃತಿ</th>
+            <th colspan="4" style="border:2px solid #333; padding:4px;">ಒಟ್ಟು</th>
+            <th colspan="4" style="border:2px solid #333; padding:4px;">ದಿನದ ವಿತರಣೆ</th>
+            <th colspan="4" style="border:2px solid #333; padding:4px;">ಅಂತಿಮ ಶಿಲ್ಕು</th>
           </tr>
           <tr>
             <th style="border:1px solid #333; padding:4px;">ಅಕ್ಕಿ</th>
@@ -267,8 +267,8 @@ export const exportStockSheetToPDF = async (
                   to3(day.closing_6to8.rice), to3(day.closing_6to8.wheat), to3(day.closing_6to8.oil), to3(day.closing_6to8.pulses)
                 ])}
               </tr>
-              <tr style="font-weight:700; background:#f2f2f2;">
-                <td style="border:1px solid #333; padding:3px;">ಒಟ್ಟು</td>
+              <tr style="font-weight:700; background:#f2f2f2; font-size:13px; border-top:2px solid #333;">
+                <td style="border:2px solid #333; padding:3px; color:#333;">ಒಟ್ಟು</td>
                 ${r([
                   String(day.children_1to5 + day.children_6to8),
                   to3(opening_total.rice), to3(opening_total.wheat), to3(opening_total.oil), to3(opening_total.pulses),
@@ -276,7 +276,7 @@ export const exportStockSheetToPDF = async (
                   to3(total_total.rice), to3(total_total.wheat), to3(total_total.oil), to3(total_total.pulses),
                   to3(dist_total.rice), to3(dist_total.wheat), to3(dist_total.oil), to3(dist_total.pulses),
                   to3(closing_total.rice), to3(closing_total.wheat), to3(closing_total.oil), to3(closing_total.pulses)
-                ])}
+                ]).replace(/td/g, 'td style="border:2px solid #333; padding:3px; background:#f2f2f2;"')}
               </tr>
             `;
           }).join('')}
