@@ -10,6 +10,22 @@ const PaymentPopup = () => (
     <h2>Payment Required</h2>
     <p>Your account is more than 7 days old. Please make a payment to continue using our service.</p>
     <a href="/dummy-payment-page">Proceed to Payment</a>
+    <button 
+      onClick={async () => {
+        await supabase.auth.signOut();
+      }}
+      style={{ 
+        marginLeft: '1rem', 
+        padding: '0.5rem 1rem', 
+        background: '#dc2626', 
+        color: 'white', 
+        border: 'none', 
+        borderRadius: '0.25rem',
+        cursor: 'pointer'
+      }}
+    >
+      Logout
+    </button>
   </div>
 );
 
