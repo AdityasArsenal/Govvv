@@ -47,7 +47,7 @@ export function UserGate({ children }: { children: React.ReactNode }) {
                 const ageInDays = ageInMs / (1000 * 60 * 60 * 24);
                 // console.log(`User account is approximately ${ageInDays.toFixed(2)} days old.`);
 
-                const sevenDays = 30 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+                const sevenDays = 40 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
                 if (ageInMs > sevenDays) {
                     setShowPaymentPopup(true);
@@ -70,7 +70,7 @@ export function UserGate({ children }: { children: React.ReactNode }) {
                 const ageInDays = ageInMs / (1000 * 60 * 60 * 24);
                 // console.log(`User account is approximately ${ageInDays.toFixed(2)} days old.`);
                 
-                const sevenDays = 30 * 24 * 60 * 60 * 1000;
+                const sevenDays = 40 * 24 * 60 * 60 * 1000;
 
                 if (ageInMs > sevenDays) {
                     setShowPaymentPopup(true);
