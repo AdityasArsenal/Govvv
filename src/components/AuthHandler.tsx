@@ -70,21 +70,21 @@ export function AuthHandler() {
         transition={{ duration: 0.3 }}
         className="w-full max-w-md p-8 mx-4 space-y-6 text-center bg-card rounded-xl shadow-lg"
       >
-        {/* <div className="space-y-2">
+        <div className="space-y-2">
           <h2 className="text-2xl font-bold tracking-tight">Welcome</h2>
           <p className="text-sm text-muted-foreground">
             Sign in to continue to your account
           </p>
-        </div> */}
+        </div>
 
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
           <h2 className="text-2xl font-bold tracking-tight">So Sorry!</h2>
           <p className="text-sm text-muted-foreground">
           ಆತ್ಮೀಯರೇ ಈಗಾಗಲೇ ತುಂಬಾ ಜನ ಈ ಆಪ್ ನ್ನು ಉಪಯೋಗಿಸುತ್ತಿರುವ ಕಾರಣ ಸದ್ಯಕ್ಕೆ ಹೊಸ login ಗಳನ್ನು ಮುಚ್ಚಲಾಗಿದೆ..ಸಹಕರಿಸಿ..
           </p>
-        </div>
+        </div> */}
 
-        {/* {user ? (
+        {user ? (
           <Button 
             onClick={handleLogout} 
             variant="outline"
@@ -101,7 +101,7 @@ export function AuthHandler() {
             <GoogleIcon />
             Continue with Google
           </Button>
-        )} */}
+        )}
         
         <p className="px-8 text-xs text-center text-muted-foreground">
           By continuing, you agree to our{" "}

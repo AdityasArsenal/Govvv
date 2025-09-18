@@ -6,27 +6,27 @@ import { User } from '@supabase/supabase-js';
 import { AuthHandler } from "@/components/AuthHandler";
 
 const PaymentPopup = () => (
-  <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', padding: '2rem', background: 'black', border: '1px solid black', zIndex: 1000 }}>
-    <h2>Payment Required</h2>
-    <p>Your account is more than 7 days old. Please make a payment to continue using our service.</p>
-    <a href="/dummy-payment-page">Proceed to Payment</a>
-    <button 
-      onClick={async () => {
-        await supabase.auth.signOut();
-      }}
-      style={{ 
-        marginLeft: '1rem', 
-        padding: '0.5rem 1rem', 
-        background: '#dc2626', 
-        color: 'white', 
-        border: 'none', 
-        borderRadius: '0.25rem',
-        cursor: 'pointer'
-      }}
-    >
-      Logout
-    </button>
-  </div>
+    <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', padding: '2rem', background: 'black', border: '1px solid black', zIndex: 1000 }}>
+        <h2>Payment Required</h2>
+        <p>Your account is more than 120 days old. Please make a payment to continue using our service.</p>
+        <a href="/dummy-payment-page">Proceed to Payment</a>
+        <button
+            onClick={async () => {
+                await supabase.auth.signOut();
+            }}
+            style={{
+                marginLeft: '1rem',
+                padding: '0.5rem 1rem',
+                background: '#dc2626',
+                color: 'white',
+                border: 'none',
+                borderRadius: '0.25rem',
+                cursor: 'pointer'
+            }}
+        >
+            Logout
+        </button>
+    </div>
 );
 
 export function UserGate({ children }: { children: React.ReactNode }) {
@@ -39,7 +39,7 @@ export function UserGate({ children }: { children: React.ReactNode }) {
             const { data: { session } } = await supabase.auth.getSession();
             const currentUser = session?.user ?? null;
             setUser(currentUser);
-            
+
             if (currentUser) {
                 const createdAt = new Date(currentUser.created_at);
                 const now = new Date();
@@ -47,9 +47,9 @@ export function UserGate({ children }: { children: React.ReactNode }) {
                 const ageInDays = ageInMs / (1000 * 60 * 60 * 24);
                 // console.log(`User account is approximately ${ageInDays.toFixed(2)} days old.`);
 
-                const sevenDays = 40 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+                const oneHundredTwentyDays = 120 * 24 * 60 * 60 * 1000; // 120 days in milliseconds
 
-                if (ageInMs > sevenDays) {
+                if (ageInMs > oneHundredTwentyDays) {
                     setShowPaymentPopup(true);
                 } else {
                     setShowPaymentPopup(false);
@@ -69,10 +69,10 @@ export function UserGate({ children }: { children: React.ReactNode }) {
                 const ageInMs = now.getTime() - createdAt.getTime();
                 const ageInDays = ageInMs / (1000 * 60 * 60 * 24);
                 // console.log(`User account is approximately ${ageInDays.toFixed(2)} days old.`);
-                
-                const sevenDays = 40 * 24 * 60 * 60 * 1000;
 
-                if (ageInMs > sevenDays) {
+                const oneHundredTwentyDays = 120 * 24 * 60 * 60 * 1000; // 120 days in milliseconds
+
+                if (ageInMs > oneHundredTwentyDays) {
                     setShowPaymentPopup(true);
                 } else {
                     setShowPaymentPopup(false);
