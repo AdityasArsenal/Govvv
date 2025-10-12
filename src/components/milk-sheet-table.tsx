@@ -45,7 +45,8 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
     const dates: MilkSheetTableRow[] = [];
 
     for (let day = 1; day <= daysInMonth; day++) {
-      const currentDate = new Date(monthStart.getFullYear(), monthStart.getMonth(), day);
+      // Use noon time to avoid timezone issues
+      const currentDate = new Date(monthStart.getFullYear(), monthStart.getMonth(), day, 12, 0, 0);
       dates.push({
         id: day,
         date: currentDate,
@@ -63,7 +64,12 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
 
   const [rows, setRows] = React.useState<MilkSheetTableRow[]>(() => {
     if (initialData && initialData.length > 0) {
-      return initialData.map(row => ({...row, date: new Date(row.date), distributionType: row.distributionType || 'milk & ragi'}));
+      return initialData.map(row => {
+        const dateStr = typeof row.date === 'string' ? row.date : row.date.toISOString();
+        const dateParts = dateStr.split('T')[0].split('-');
+        const safeDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]), 12, 0, 0);
+        return {...row, date: safeDate, distributionType: row.distributionType || 'milk & ragi'};
+      });
     }
     return generateMonthDates(selectedMonth);
   });
@@ -72,12 +78,17 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
 
   React.useEffect(() => {
     if (initialData && initialData.length > 0) {
-      const normalized = initialData.map(row => ({...row, date: new Date(row.date), distributionType: row.distributionType || 'milk & ragi'}));
+      const normalized = initialData.map(row => {
+        const dateStr = typeof row.date === 'string' ? row.date : row.date.toISOString();
+        const dateParts = dateStr.split('T')[0].split('-');
+        const safeDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]), 12, 0, 0);
+        return {...row, date: safeDate, distributionType: row.distributionType || 'milk & ragi'};
+      });
       const equal = rows.length === normalized.length && rows.every((r, i) => {
         const n = normalized[i];
         return (
           r.id === n.id &&
-          new Date(r.date).getTime() === new Date(n.date).getTime() &&
+          r.date.getTime() === n.date.getTime() &&
           r.totalChildren === n.totalChildren &&
           r.openingMilkPowder === n.openingMilkPowder &&
           r.openingRagi === n.openingRagi &&
@@ -90,7 +101,7 @@ export function MilkSheetTable({ selectedMonth, initialData, onTableDataChange, 
     } else {
       setRows(generateMonthDates(selectedMonth));
     }
-  }, [selectedMonth, initialData, generateMonthDates]);
+  }, [selectedMonth, initialData, generateMonthDates, rows]);
 
   const handleInputChange = React.useCallback((id: number, field: keyof MilkSheetTableRow, value: any) => {
     const newRows = [...rows];

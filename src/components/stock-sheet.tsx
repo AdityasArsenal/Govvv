@@ -63,7 +63,7 @@ export function StockSheetTable({
     const daysInMonth = getDaysInMonth(date);
     const monthStart = startOfMonth(date);
     return Array.from({ length: daysInMonth }, (_, i) => {
-      const currentDate = new Date(monthStart.getFullYear(), monthStart.getMonth(), i + 1);
+      const currentDate = new Date(monthStart.getFullYear(), monthStart.getMonth(), i + 1, 12, 0, 0);
       const isFirstDay = i + 1 === 1;
       return {
         id: i + 1,
@@ -81,41 +81,51 @@ export function StockSheetTable({
 
   const [rows, setRows] = React.useState<StockSheetRow[]>(() => {
     if (initialData && initialData.length > 0) {
-      return initialData.map(row => ({
-        id: row.id,
-        date: new Date(row.date),
-        added_1to5: row.added_1to5 || emptyStockItem(),
-        added_6to8: row.added_6to8 || emptyStockItem(),
-        // Handle opening stock for existing data
-        ...(row.id === 1 && {
-          opening_1to5: row.opening_1to5 || emptyStockItem(),
-          opening_6to8: row.opening_6to8 || emptyStockItem(),
-        }),
-      }));
+      return initialData.map(row => {
+        const dateStr = typeof row.date === 'string' ? row.date : row.date.toISOString();
+        const dateParts = dateStr.split('T')[0].split('-');
+        const safeDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]), 12, 0, 0);
+        return {
+          id: row.id,
+          date: safeDate,
+          added_1to5: row.added_1to5 || emptyStockItem(),
+          added_6to8: row.added_6to8 || emptyStockItem(),
+          // Handle opening stock for existing data
+          ...(row.id === 1 && {
+            opening_1to5: row.opening_1to5 || emptyStockItem(),
+            opening_6to8: row.opening_6to8 || emptyStockItem(),
+          }),
+        };
+      });
     }
     return generateMonthDates(selectedMonth);
   });
 
   React.useEffect(() => {
     if (initialData && initialData.length > 0) {
-      const normalized = initialData.map(row => ({
-        id: row.id,
-        date: new Date(row.date),
-        added_1to5: row.added_1to5 || emptyStockItem(),
-        added_6to8: row.added_6to8 || emptyStockItem(),
-        // Handle opening stock for day 1
-        ...(row.id === 1 && {
-          opening_1to5: row.opening_1to5 || emptyStockItem(),
-          opening_6to8: row.opening_6to8 || emptyStockItem(),
-        }),
-      }));
+      const normalized = initialData.map(row => {
+        const dateStr = typeof row.date === 'string' ? row.date : row.date.toISOString();
+        const dateParts = dateStr.split('T')[0].split('-');
+        const safeDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]), 12, 0, 0);
+        return {
+          id: row.id,
+          date: safeDate,
+          added_1to5: row.added_1to5 || emptyStockItem(),
+          added_6to8: row.added_6to8 || emptyStockItem(),
+          // Handle opening stock for day 1
+          ...(row.id === 1 && {
+            opening_1to5: row.opening_1to5 || emptyStockItem(),
+            opening_6to8: row.opening_6to8 || emptyStockItem(),
+          }),
+        };
+      });
 
       // Guard: only update if actually different
       const equal = rows.length === normalized.length && rows.every((r, i) => {
         const n = normalized[i];
         return (
           r.id === n.id &&
-          new Date(r.date).getTime() === new Date(n.date).getTime() &&
+          r.date.getTime() === n.date.getTime() &&
           r.added_1to5.rice === n.added_1to5.rice &&
           r.added_1to5.wheat === n.added_1to5.wheat &&
           r.added_1to5.oil === n.added_1to5.oil &&

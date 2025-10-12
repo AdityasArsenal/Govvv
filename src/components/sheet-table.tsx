@@ -82,7 +82,7 @@ export function SheetTable({ selectedMonth, initialData, onTableDataChange, zoom
     const monthStart = startOfMonth(date);
     return Array.from({ length: daysInMonth }, (_, i) => ({
       id: i + 1,
-      date: new Date(monthStart.getFullYear(), monthStart.getMonth(), i + 1),
+      date: new Date(monthStart.getFullYear(), monthStart.getMonth(), i + 1, 12, 0, 0),
       count1to5: 0,
       count6to8: 0,
       mealType: null,
@@ -92,12 +92,17 @@ export function SheetTable({ selectedMonth, initialData, onTableDataChange, zoom
 
   const [rows, setRows] = React.useState<SheetTableRow[]>(() => {
     if (initialData && initialData.length > 0) {
-      return initialData.map(row => ({
-        ...row,
-        date: new Date(row.date),
-        mealType: normalizeMealType((row as any).mealType),
-        includesPulses: (row as any).includesPulses ?? false,
-      }));
+      return initialData.map(row => {
+        const dateStr = typeof row.date === 'string' ? row.date : row.date.toISOString();
+        const dateParts = dateStr.split('T')[0].split('-');
+        const safeDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]), 12, 0, 0);
+        return {
+          ...row,
+          date: safeDate,
+          mealType: normalizeMealType((row as any).mealType),
+          includesPulses: (row as any).includesPulses ?? false,
+        };
+      });
     }
     return generateMonthDates(selectedMonth);
   });
@@ -106,17 +111,22 @@ export function SheetTable({ selectedMonth, initialData, onTableDataChange, zoom
 
   React.useEffect(() => {
     if (initialData && initialData.length > 0) {
-      const normalized = initialData.map(row => ({
-        ...row,
-        date: new Date(row.date),
-        mealType: normalizeMealType((row as any).mealType),
-        includesPulses: (row as any).includesPulses ?? false,
-      }));
+      const normalized = initialData.map(row => {
+        const dateStr = typeof row.date === 'string' ? row.date : row.date.toISOString();
+        const dateParts = dateStr.split('T')[0].split('-');
+        const safeDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]), 12, 0, 0);
+        return {
+          ...row,
+          date: safeDate,
+          mealType: normalizeMealType((row as any).mealType),
+          includesPulses: (row as any).includesPulses ?? false,
+        };
+      });
       const equal = rows.length === normalized.length && rows.every((r, i) => {
         const n = normalized[i];
         return (
           r.id === n.id &&
-          new Date(r.date).getTime() === new Date(n.date).getTime() &&
+          r.date.getTime() === n.date.getTime() &&
           r.count1to5 === n.count1to5 &&
           r.count6to8 === n.count6to8 &&
           r.mealType === n.mealType &&
@@ -127,7 +137,7 @@ export function SheetTable({ selectedMonth, initialData, onTableDataChange, zoom
     } else {
       setRows(generateMonthDates(selectedMonth));
     }
-  }, [selectedMonth, initialData, generateMonthDates]);
+  }, [selectedMonth, initialData, generateMonthDates, rows]);
 
   // Update parent component with current table data whenever rows change
   React.useEffect(() => {

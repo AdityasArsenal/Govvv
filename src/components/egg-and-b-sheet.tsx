@@ -64,7 +64,7 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange, zo
     const daysInMonth = getDaysInMonth(date);
     const monthStart = startOfMonth(date);
     return Array.from({ length: daysInMonth }, (_, i) => {
-      const currentDate = new Date(monthStart.getFullYear(), monthStart.getMonth(), i + 1);
+      const currentDate = new Date(monthStart.getFullYear(), monthStart.getMonth(), i + 1, 12, 0, 0);
       return {
         id: i + 1,
         date: currentDate,
@@ -86,7 +86,12 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange, zo
         if (typeof meta.bananaPrice === 'number') setBananaPrice(meta.bananaPrice);
       }
       const filtered = initialData.filter((r: any) => !(r && r.__meta === 'egg_and_b_prices'));
-      return filtered.map(row => ({...row, date: new Date((row as any).date)}));
+      return filtered.map(row => {
+        const dateStr = typeof (row as any).date === 'string' ? (row as any).date : (row as any).date.toISOString();
+        const dateParts = dateStr.split('T')[0].split('-');
+        const safeDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]), 12, 0, 0);
+        return {...row, date: safeDate};
+      });
     }
     return generateMonthDates(selectedMonth);
   });
@@ -106,12 +111,17 @@ export function EggAndBSheet({ selectedMonth, initialData, onTableDataChange, zo
         if (typeof meta.bananaPrice === 'number') setBananaPrice(meta.bananaPrice);
       }
       const filtered = initialData.filter((r: any) => !(r && r.__meta === 'egg_and_b_prices'));
-      const normalized = filtered.map(row => ({...row, date: new Date((row as any).date)}));
+      const normalized = filtered.map(row => {
+        const dateStr = typeof (row as any).date === 'string' ? (row as any).date : (row as any).date.toISOString();
+        const dateParts = dateStr.split('T')[0].split('-');
+        const safeDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]), 12, 0, 0);
+        return {...row, date: safeDate};
+      });
       const equal = rows.length === normalized.length && rows.every((r, i) => {
         const n = normalized[i] as any;
         return (
           r.id === n.id &&
-          new Date(r.date).getTime() === new Date(n.date).getTime() &&
+          r.date.getTime() === n.date.getTime() &&
           r.payer === n.payer &&
           r.eggMale === n.eggMale &&
           r.eggFemale === n.eggFemale &&
