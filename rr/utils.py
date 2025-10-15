@@ -49,7 +49,7 @@ if __name__ == "__main__":
     
     if token:
         print("\n✅ Successfully retrieved Access Token:")
-        print(token[:50] + "...") 
+        print(f'token : {token}') 
     else:
         print("\n❌ Failed to retrieve Access Token.")
 

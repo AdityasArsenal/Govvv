@@ -44,9 +44,9 @@ const TermsAndConditionsPage = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">4. Payment Terms</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">4. Service Usage</h2>
               <p className="text-lg text-gray-600">
-                Data Canvas will offer premium features through a subscription model, with payments facilitated via a UPI-based system. Detailed pricing and payment procedures will be available on our website. All payments are subject to our Refund Policy.
+                Data Canvas is provided as a free service to assist school personnel in their administrative tasks. We reserve the right to modify or discontinue features at any time with reasonable notice to users.
               </p>
             </section>
 

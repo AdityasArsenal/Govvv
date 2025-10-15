@@ -89,7 +89,9 @@ export function useSheetData() {
           return;
         }
 
-        const monthStr = selectedMonth.toISOString().slice(0, 7);
+        const year = selectedMonth.getFullYear();
+        const month = (selectedMonth.getMonth() + 1).toString().padStart(2, '0');
+        const monthStr = `${year}-${month}`;
         const { data, error } = await supabase
           .from('monthly_sheet_data')
           .select('sheet_name, data')
@@ -160,11 +162,15 @@ export function useSheetData() {
         return;
       }
 
-      const savePromises = Object.keys(allSheetsData).map(async (sheetName) => {
+        const savePromises = Object.keys(allSheetsData).map(async (sheetName) => {
+        const year = selectedMonth.getFullYear();
+        const month = (selectedMonth.getMonth() + 1).toString().padStart(2, '0');
+        const monthStr = `${year}-${month}`;
+        
         const dataToSave = {
           user_id: user.id,
           sheet_name: sheetName,
-          month: selectedMonth.toISOString().slice(0, 7),
+          month: monthStr,
           data: allSheetsData[sheetName],
           last_saved: new Date().toISOString(),
         };

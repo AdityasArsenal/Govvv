@@ -14,6 +14,9 @@
 .shine-effect {
   position: relative;
   overflow: hidden;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .shine-effect::after {
@@ -25,11 +28,12 @@
   height: 100%;
   background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100%);
   animation: shine 2s infinite;
-  animation-delay: 0.5s; /* Start after a short delay */
+  animation-delay: 0.5s;
 }
 
 .blinking {
   animation: blink 1.5s infinite;
+  will-change: opacity;
 }
 
 @keyframes blink {
@@ -39,148 +43,38 @@
 
 body {
   font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-@layer base {
-  :root {
-    --background: 210 40% 98%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 210 40% 98%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 210 40% 98%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 231 77% 66%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 174 58% 53%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 231 77% 66%;
-    --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-  .dark {
-    --background: 224 28% 14%;
-    --foreground: 215 20% 90%;
-    --card: 224 28% 14%;
-    --card-foreground: 215 20% 90%;
-    --popover: 224 28% 14%;
-    --popover-foreground: 215 20% 90%;
-    --primary: 231 77% 66%;
-    --primary-foreground: 224 28% 10%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 174 58% 53%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 231 77% 66%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
+/* Mobile optimizations */
+@media (max-width: 768px) {
   body {
-    @apply bg-background text-foreground;
+    font-size: 14px;
+  }
+  
+  /* Improve tap targets on mobile */
+  button, a, input, select, textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Reduce animations on mobile for better performance */
+  * {
+    animation-duration: 0.5s !important;
+    transition-duration: 0.2s !important;
   }
 }
 
-@page {
-  size: A4 portrait;
-  margin: 10mm; /* adjust as needed */
-}
-.pdf-container {
-  width: 100%;
-  /* … */
+/* Performance optimizations */
+* {
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Roadmap Animation */
-.roadmap-item .w-5\/12 > div {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-}
-
-.roadmap-item.is-visible .w-5\/12 > div {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.roadmap-item:nth-child(odd).is-visible .w-5\/12 > div {
-  transition-delay: 0.2s;
-}
-
-.roadmap-item:nth-child(even).is-visible .w-5\/12 > div {
-  transition-delay: 0.4s;
-}
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@keyframes shine {
-  0% {
-    transform: translateX(-100%) skewX(-25deg);
-  }
-  100% {
-    transform: translateX(200%) skewX(-25deg);
-  }
-}
-
-.shine-effect {
-  position: relative;
-  overflow: hidden;
-}
-
-.shine-effect::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(193, 193, 189, 0.977) 50%, rgba(255, 255, 255, 0) 100%);
-  animation: shine 2s infinite;
-  animation-delay: 0.5s; /* Start after a short delay */
-}
-
-
-
-.blinking {
-  animation: blink 1.5s infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-body {
-  font-family: Arial, Helvetica, sans-serif;
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }
 
 @layer base {
@@ -219,6 +113,7 @@ body {
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+  
   .dark {
     --background: 224 28% 14%;
     --foreground: 215 20% 90%;
@@ -266,11 +161,29 @@ body {
 
 @page {
   size: A4 portrait;
-  margin: 10mm; /* adjust as needed */
+  margin: 10mm;
 }
+
 .pdf-container {
   width: 100%;
-  /* … */
 }
 
+/* Roadmap Animation */
+.roadmap-item .w-5\/12 > div {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
 
+.roadmap-item.is-visible .w-5\/12 > div {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.roadmap-item:nth-child(odd).is-visible .w-5\/12 > div {
+  transition-delay: 0.2s;
+}
+
+.roadmap-item:nth-child(even).is-visible .w-5\/12 > div {
+  transition-delay: 0.4s;
+}

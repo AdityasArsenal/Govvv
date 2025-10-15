@@ -9,6 +9,22 @@ import { UserGate } from "@/components/UserGate";
 export const metadata: Metadata = {
   title: 'Data Canvas',
   description: 'An intelligent data sheet application.',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: 'white' },
+    { media: '(prefers-color-scheme: dark)', color: 'black' },
+  ],
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Data Canvas',
+  },
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
@@ -22,6 +38,8 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
       <body className="font-body antialiased">
         <Script async src="https://www.googletagmanager.com/gtag/js?id=G-SX23QRYC4G"></Script>

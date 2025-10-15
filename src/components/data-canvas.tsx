@@ -1,19 +1,37 @@
 "use client";
 
 import * as React from "react";
+import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { SheetSelector } from "@/components/sheet-selector";
 import { DateRangePicker } from "@/components/date-range-picker";
-import { SheetTable } from "@/components/sheet-table";
-import { MilkSheetTable } from "@/components/milk-sheet-table";
-import { EggAndBSheet } from "@/components/egg-and-b-sheet";
-import { StockSheetTable } from "@/components/stock-sheet";
 import { useToast } from "@/hooks/use-toast";
 import { PageHeader } from "@/components/PageHeader";
 import { useSheetData } from "@/hooks/useSheetData";
 import { exportStockSheetToPDF } from '@/lib/stockPdfUtils';
+
+// Lazy load heavy sheet components for better performance
+const SheetTable = dynamic(() => import("@/components/sheet-table").then(mod => ({ default: mod.SheetTable })), {
+  loading: () => <div className="flex items-center justify-center h-96"><Loader2 className="h-8 w-8 animate-spin" /></div>,
+  ssr: false
+});
+
+const MilkSheetTable = dynamic(() => import("@/components/milk-sheet-table").then(mod => ({ default: mod.MilkSheetTable })), {
+  loading: () => <div className="flex items-center justify-center h-96"><Loader2 className="h-8 w-8 animate-spin" /></div>,
+  ssr: false
+});
+
+const EggAndBSheet = dynamic(() => import("@/components/egg-and-b-sheet").then(mod => ({ default: mod.EggAndBSheet })), {
+  loading: () => <div className="flex items-center justify-center h-96"><Loader2 className="h-8 w-8 animate-spin" /></div>,
+  ssr: false
+});
+
+const StockSheetTable = dynamic(() => import("@/components/stock-sheet").then(mod => ({ default: mod.StockSheetTable })), {
+  loading: () => <div className="flex items-center justify-center h-96"><Loader2 className="h-8 w-8 animate-spin" /></div>,
+  ssr: false
+});
 
 
 export default function DataCanvas() {
